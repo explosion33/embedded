@@ -1,0 +1,38 @@
+PYTHON_VERSION = "3.14"
+
+module(
+    name = "embedded",
+    version = "0.1.0",
+)
+
+bazel_dep(name = "platforms", version = "1.1.0")
+bazel_dep(name = "rules_python", version = "2.3.3")
+
+# Don't auto generate __init__.py files for python packages.
+rules_python_config = use_extension("@rules_python//python/extensions:config.bzl", "config")
+rules_python_config.explicit_init_py(default = True)
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    python_version = PYTHON_VERSION,
+    is_default = True,
+)
+
+# The uv toolchain, used only by `bazel run //:uv.update` to regenerate uv.lock.
+uv = use_extension(
+    "@rules_python//python/uv:uv.bzl",
+    "uv",
+    dev_dependency = True,
+)
+uv.configure(version = "0.12.15")
+
+# Turns uv.lock into the `@pypi` repo, so third-party deps are labels like
+# `@pypi//requests`. No pip involved: wheel URLs and hashes come straight
+# out of uv.lock and are fetched by the Bazel downloader.
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "pypi",
+    python_version = PYTHON_VERSION,
+    uv_lock = "//:uv.lock",
+)
+use_repo(pip, "pypi")
