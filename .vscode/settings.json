@@ -1,0 +1,10 @@
+{
+    "clang-format.executable": "${workspaceRoot}/bazel-bin/clang_format",
+    "editor.formatOnSave": true,
+    "[c]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    }
+}

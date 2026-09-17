@@ -1,0 +1,48 @@
+# Make your own at: https://zed0.co.uk/clang-format-configurator/
+---
+BasedOnStyle: Google
+# Force pointers to the type for C++.
+DerivePointerAlignment: false
+PointerAlignment: Left
+QualifierAlignment: Custom
+# Always put const before type.
+QualifierOrder: [const, type]
+# Treat Abseil nullability annotations as attributes so they don't break
+# pointer alignment (otherwise `T* absl_nonnull` formats as `T * absl_nonnull`).
+AttributeMacros:
+  - absl_nonnull
+  - absl_nullable
+  - absl_nullability_unknown
+IncludeCategories:
+  # 3rd-party includes (note the priority, these come later).
+  - Regex: '^((<|")((catch2|Eigen|arc)/|aw_|pb_|flatbuffers|tinyalloc.h|nanoprintf.h))'
+    Priority: 4
+    SortPriority: 4
+    CaseSensitive: true
+  # C-style system includes.
+  - Regex: '^<.*\.h(pp)?>$'
+    Priority: 1
+    # C-style should come after C++-style.
+    SortPriority: 2
+    CaseSensitive: true
+  # C++-style system includes.
+  - Regex: '^<.*>$'
+    Priority: 1
+    SortPriority: 1
+    CaseSensitive: true
+  # FreeRTOS.h comes first in our 3rd party include section.
+  - Regex: '^"(FreeRTOS\.h)"$'
+    Priority: 2
+    SortPriority: 3
+    CaseSensitive: true
+  # Other FreeRTOS headers.
+  - Regex: '^"(task\.h|list\.h|queue\.h|semphr\.h)"$'
+    Priority: 2
+    SortPriority: 3
+    CaseSensitive: true
+  # 1st-party includes.
+  - Regex: '".*"'
+    Priority: 5
+    SortPriority: 5
+    CaseSensitive: true
+...

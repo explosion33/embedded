@@ -1,3 +1,6 @@
 common --repo_env=CC=clang
 common --repo_env=CXX=clang++
 common --repo_env=BAZEL_COMPILER=clang
+
+build --cxxopt=-std=c++20
+build --host_cxxopt=-std=c++20
