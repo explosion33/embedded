@@ -1,5 +1,14 @@
 PYTHON_VERSION = "3.14"
 
+# STM32 / ARM Toolchain version pins.
+ARM_TOOLCHAIN_VERSION = "14.3.rel1"
+
+CMSIS_CORE_VERSION = "5.9.0_20250520"
+
+CMSIS_DEVICE_F4_VERSION = "2.6.11"
+
+STM32F4XX_HAL_DRIVER_VERSION = "1.8.5"
+
 module(
     name = "embedded",
     version = "0.1.0",
@@ -22,8 +31,8 @@ rules_python_config.explicit_init_py(default = True)
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
-    python_version = PYTHON_VERSION,
     is_default = True,
+    python_version = PYTHON_VERSION,
 )
 
 # The uv toolchain, used only by `bazel run //:uv.update` to regenerate uv.lock.
@@ -44,3 +53,42 @@ pip.parse(
     uv_lock = "//:uv.lock",
 )
 use_repo(pip, "pypi")
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# Fetch the bare-metal arm cross compiler.
+http_archive(
+    name = "arm_none_eabi",
+    build_file = "//platform/toolchains/arm_none_eabi:external.BUILD",
+    sha256 = "8f6903f8ceb084d9227b9ef991490413014d991874a1e34074443c2a72b14dbd",
+    strip_prefix = "arm-gnu-toolchain-%s-x86_64-arm-none-eabi" % ARM_TOOLCHAIN_VERSION,
+    url = ("https://developer.arm.com/-/media/Files/downloads/gnu/{v}/binrel/" +
+           "arm-gnu-toolchain-{v}-x86_64-arm-none-eabi.tar.xz").format(v = ARM_TOOLCHAIN_VERSION),
+)
+
+# Fetch the STM CMSIS / HAL / LL drivers.
+http_archive(
+    name = "cmsis_core",
+    build_file = "//platform/external:cmsis_core.BUILD",
+    sha256 = "da3e50301da157f322dba1d63bab3851c7ac8d793e3b13d7f621270d130aebd3",
+    strip_prefix = "cmsis-core-%s" % CMSIS_CORE_VERSION,
+    url = "https://github.com/STMicroelectronics/cmsis-core/archive/refs/tags/v%s.tar.gz" % CMSIS_CORE_VERSION,
+)
+
+http_archive(
+    name = "cmsis_device_f4",
+    build_file = "//platform/external:cmsis_device_f4.BUILD",
+    sha256 = "c0dce054b1cd53135a3763c97b6cdef02a96d2495c78d8677cdbf37114d47a0c",
+    strip_prefix = "cmsis-device-f4-%s" % CMSIS_DEVICE_F4_VERSION,
+    url = "https://github.com/STMicroelectronics/cmsis_device_f4/archive/refs/tags/v%s.tar.gz" % CMSIS_DEVICE_F4_VERSION,
+)
+
+http_archive(
+    name = "stm32f4xx_hal_driver",
+    build_file = "//platform/external:stm32f4xx_hal_driver.BUILD",
+    sha256 = "1d792fa91a15531b181aadbbd794e7c086650036406ad71932507f0cc8b7ca56",
+    strip_prefix = "stm32f4xx-hal-driver-%s" % STM32F4XX_HAL_DRIVER_VERSION,
+    url = "https://github.com/STMicroelectronics/stm32f4xx_hal_driver/archive/refs/tags/v%s.tar.gz" % STM32F4XX_HAL_DRIVER_VERSION,
+)
+
+register_toolchains("//platform/toolchains/arm_none_eabi:arm_none_eabi_toolchain")
