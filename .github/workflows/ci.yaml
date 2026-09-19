@@ -2,12 +2,13 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   host-tests:
-    uses: ./.github/workflows/bazel_test_template.yml
+    uses: ./.github/workflows/bazel_test_template.yaml
     with:
       test_target: '//...'
