@@ -15,3 +15,8 @@ lock(
     srcs = ["pyproject.toml"],
     out = "uv.lock",
 )
+
+alias(
+    name = "generate_compile_commands",
+    actual = "//tools/linting:generate_compile_commands",
+)
