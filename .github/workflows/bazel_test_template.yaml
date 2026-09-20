@@ -23,5 +23,5 @@ jobs:
           disk-cache: ${{ github.workflow }}-${{ inputs.test_target }}
           repository-cache: true
 
-      - name: Run Bazel tests
+      - name: Run Bazel Target
         run: bazel test -c opt ${{ inputs.test_target }} --test_output=errors
