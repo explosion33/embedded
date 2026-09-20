@@ -4,10 +4,32 @@ version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = []
 
-# Adds clang-format to the uv.lock allowing bazel rules python to read and use
-# these packages.
+
 [dependency-groups]
 dev = [
-    "clang-format==23.1.1",
     "click==8.3.0",
+    "ruff>=0.15.10",
+    "types-pyyaml>=6.0.12.20260408",
+    # Adds clang-format to the uv.lock allowing bazel rules python to read and use
+    # these packages.
+    "clang-format==23.1.1",
 ]
+
+# Configure python linting
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.lint]
+select = [
+    "E",   # Errors
+    "F",   # Pyflakes
+    "W",   # Warnings
+    "I",   # Isort
+    "B",   # Flake8
+    "UP",  # PyUprade
+    "SIM", # Flake8 Simplify
+    "RUF", # Ruff-Specific
+    "N",   # Pep8 Naming
+]
+# Don't auto-remove imports
+unfixable = ["F401"]
