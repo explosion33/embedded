@@ -8,13 +8,20 @@ on:
   workflow_dispatch:
 
 jobs:
+  build:
+    uses: ./.github/workflows/bazel_action_template.yaml
+    with:
+      action: "build"
+      target: '//...'
   host-tests:
-    uses: ./.github/workflows/bazel_test_template.yaml
+    uses: ./.github/workflows/bazel_action_template.yaml
     with:
-      test_target: '//...'
+      action: "test"
+      target: '//...'
   lint:
-    uses: ./.github/workflows/bazel_run_template.yaml
+    uses: ./.github/workflows/bazel_action_template.yaml
     with:
+      action: "run"
       target: ':lint'
       args: "--check"
       uv_sync: true
