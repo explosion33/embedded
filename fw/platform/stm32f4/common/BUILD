@@ -21,8 +21,7 @@ cc_library(
         {
             "//fw/platform/constraints:is_stm32f446": ["STM32F446xx"],
         },
-        no_match_error = "//fw/platform/stm32f4 requires an STM32F4 target platform, " +
-                         "e.g. --config=f446",
+        no_match_error = "//fw/platform/stm32f4 requires an STM32F4 target platform",
     ),
     target_compatible_with = TARGET_COMPATIBLE_WITH,
     deps = ["@cmsis_device_f4//:headers"],

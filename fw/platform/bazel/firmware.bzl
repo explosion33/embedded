@@ -51,23 +51,56 @@ _objcopy_binary = rule(
     toolchains = use_cc_toolchain(),
 )
 
+def _platform_transition_impl(settings, attr):
+    _ = settings
+    return {"//command_line_option:platforms": [str(attr.platform)]}
+
+_platform_transition = transition(
+    implementation = _platform_transition_impl,
+    inputs = [],
+    outputs = ["//command_line_option:platforms"],
+)
+
+def _fw_image_impl(ctx):
+    return [DefaultInfo(files = depset(
+        transitive = [src[DefaultInfo].files for src in ctx.attr.srcs],
+    ))]
+
+_fw_image = rule(
+    implementation = _fw_image_impl,
+    doc = "Builds source files for its labeled platform",
+    attrs = {
+        "srcs": attr.label_list(
+            cfg = _platform_transition,
+            mandatory = True,
+            doc = "The outputs to build for `platform`.",
+        ),
+        "platform": attr.label(
+            mandatory = True,
+            doc = "The platform to build `srcs` for.",
+        ),
+    },
+)
+
 def cc_fw_app(
         name,
         linker_script,
+        platform,
         srcs = [],
         deps = [],
         linkopts = [],
-        target_compatible_with = [],
+        target_compatible_with = ["@platforms//os:none"],
         **kwargs):
     """Builds a flashable firmware image. Produces .bin .elf and .map files.
 
     Args:
       name: Name of the firmware image.
       linker_script: The linker script describing the part's memory map.
+      platform: The platform to cross compile this app for.
       srcs: C/C++/assembly sources.
       deps: cc_library/binary dependencies for this app.
       linkopts: Extra linker flags.
-      target_compatible_with: Targets this app is compatible with.
+      target_compatible_with: Platforms the .elf and .bin can be built for.
       **kwargs: Args passed through to the underyling binary.
     """
     elf_name = name + ".elf"
@@ -93,10 +126,17 @@ def cc_fw_app(
     )
 
     native.filegroup(
+        name = name + ".map",
+        srcs = [":" + elf_name],
+        output_group = "linkmap",
+    )
+
+    _fw_image(
         name = name,
         srcs = [
             ":" + elf_name,
             ":" + name + ".bin",
+            ":" + name + ".map",
         ],
-        target_compatible_with = target_compatible_with,
+        platform = platform,
     )
