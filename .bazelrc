@@ -7,4 +7,4 @@ build --host_cxxopt=-std=c++20
 
 # Selects the STM32F446 family for a firmware build, usage:
 # bazel build --config=f446 //path/to:target
-build:f446 --platforms=//platform/stm32f4/f446:platform
+build:f446 --platforms=//fw/platform/stm32f4/f446:platform
