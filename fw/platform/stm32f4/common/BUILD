@@ -1,6 +1,6 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
-package(default_visibility = ["//platform/stm32f4:__subpackages__"])
+package(default_visibility = ["//fw/platform/stm32f4:__subpackages__"])
 
 # ST's drivers are third-party code we do not intend to fix warnings in.
 VENDOR_COPTS = [
@@ -19,9 +19,9 @@ cc_library(
     copts = VENDOR_COPTS,
     defines = select(
         {
-            "//platform/constraints:is_stm32f446": ["STM32F446xx"],
+            "//fw/platform/constraints:is_stm32f446": ["STM32F446xx"],
         },
-        no_match_error = "//platform/stm32f4 requires an STM32F4 target platform, " +
+        no_match_error = "//fw/platform/stm32f4 requires an STM32F4 target platform, " +
                          "e.g. --config=f446",
     ),
     target_compatible_with = TARGET_COMPATIBLE_WITH,
