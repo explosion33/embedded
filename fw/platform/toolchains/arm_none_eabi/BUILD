@@ -77,7 +77,7 @@ cc_args(
         "@rules_cc//cc/toolchains/actions:assembly_actions",
     ],
     args = select({
-        "//platform/constraints:cortex_m4f": [
+        "//fw/platform/constraints:cortex_m4f": [
             "-mcpu=cortex-m4",
             "-mthumb",
             "-mfpu=fpv4-sp-d16",
