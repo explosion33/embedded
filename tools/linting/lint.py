@@ -43,9 +43,7 @@ def python_lint(fix: bool) -> bool:
 def main(check: bool) -> None:
     """Lint the workspace's python sources."""
     if not WORKSPACE:
-        raise click.ClickException(
-            "BUILD_WORKSPACE_DIRECTORY is unset; run this with `bazel run`"
-        )
+        raise click.ClickException("BUILD_WORKSPACE_DIRECTORY is unset; run this with `bazel run`")
 
     if not python_lint(not check):
         raise click.ClickException("Linting Contains Errors.")
