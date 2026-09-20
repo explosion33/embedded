@@ -44,7 +44,11 @@ def echo(message: str) -> None:
 def bazel(*args: str) -> str:
     """Runs bazel in the WORKSPACE"""
     done = subprocess.run(
-        ["bazel", *args], cwd=WORKSPACE, text=True, capture_output=True, check=False
+        ["bazel", *args],
+        cwd=WORKSPACE,
+        text=True,
+        capture_output=True,
+        check=False,
     )
     if done.returncode != 0:
         raise click.ClickException(f"bazel {' '.join(args)} failed:\n{done.stderr}")
@@ -54,9 +58,7 @@ def bazel(*args: str) -> str:
 def platform_configs() -> dict[str, frozenset[str]]:
     """Maps each platform-selecting --config in .bazelrc to its constraints."""
 
-    platform_config_re = re.compile(
-        r"^(?:build|common):([\w.-]+)\s+--platforms[=\s]+(\S+)"
-    )
+    platform_config_re = re.compile(r"^(?:build|common):([\w.-]+)\s+--platforms[=\s]+(\S+)")
 
     configs = {}
     for line in (WORKSPACE / ".bazelrc").read_text().splitlines():
@@ -64,7 +66,9 @@ def platform_configs() -> dict[str, frozenset[str]]:
         if match:
             name, platform = match.groups()
             constraints = bazel(
-                "query", f"labels(constraint_values, {platform})", "--output=label"
+                "query",
+                f"labels(constraint_values, {platform})",
+                "--output=label",
             )
             configs[name] = frozenset(constraints.split())
     return configs
@@ -99,9 +103,7 @@ def group_by_config(
             groups[None].append(target)
             continue
 
-        matches = [
-            name for name, satisfied in configs.items() if constraints <= satisfied
-        ]
+        matches = [name for name, satisfied in configs.items() if constraints <= satisfied]
 
         if not matches:
             # Nothing in .bazelrc can build this. Bazel would skip it as
@@ -144,9 +146,7 @@ def generate(generator: str, config: str | None, targets: list[str]) -> list[dic
 
         done = subprocess.run(command, cwd=WORKSPACE, check=False)
         if done.returncode != 0:
-            raise click.ClickException(
-                f"generating compile commands for {label} failed"
-            )
+            raise click.ClickException(f"generating compile commands for {label} failed")
         return json.loads(pathlib.Path(out.name).read_text())
 
 
@@ -178,9 +178,7 @@ def key(entry: dict) -> str:
 def main(targets: tuple[str, ...], clean: bool) -> None:
     """Generate the compile_commands.json for clangd."""
     if not WORKSPACE:
-        raise click.ClickException(
-            "BUILD_WORKSPACE_DIRECTORY is unset; run this with `bazel run`"
-        )
+        raise click.ClickException("BUILD_WORKSPACE_DIRECTORY is unset; run this with `bazel run`")
     patterns = list(targets) or ["//..."]
 
     generator = runfiles.Create().Rlocation(os.environ["BAZEL_COMPILE_COMMANDS"])
@@ -202,10 +200,7 @@ def main(targets: tuple[str, ...], clean: bool) -> None:
             entries[key(entry)] = entry
 
     database.write_text(json.dumps(list(entries.values()), indent=2))
-    echo(
-        f"{database.name}: {len(entries)} entries "
-        f"({len(entries) - kept:+d} from this run)"
-    )
+    echo(f"{database.name}: {len(entries)} entries ({len(entries) - kept:+d} from this run)")
 
 
 if __name__ == "__main__":
