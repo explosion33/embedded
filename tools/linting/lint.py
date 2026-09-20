@@ -43,6 +43,11 @@ def _python_commands(fix: bool) -> list[list[str]]:
 def python_lint(fix: bool) -> bool:
     """Lints python files. Returns True if lint was succesfull (no errors / all
     files fixed)."""
+    # pyright resolves third-party imports through the uv-managed .venv (see [tool.pyright] in
+    # pyproject.toml).
+    if not (WORKSPACE / ".venv").is_dir():
+        raise click.ClickException(f"{WORKSPACE / '.venv'} is missing. run `uv sync` first")
+
     failed = False
     for cmd in _python_commands(fix):
         click.echo(f"$ {' '.join(cmd)}")

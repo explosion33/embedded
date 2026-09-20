@@ -36,9 +36,7 @@ select = [
 # Don't auto-remove imports
 unfixable = ["F401"]
 
-# Configure type checking. Point pyright at the uv-managed venv so third-party
-# imports resolve outside of bazel; run `uv sync` after changing the dev group.
-# Configure type checking. We point pyright at .venv so third_party imports can
+# Configure type checking. Point pyright at the uv-managed venv so third-party imports
 # resolve.
 [tool.pyright]
 venvPath = "."

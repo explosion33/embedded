@@ -15,5 +15,6 @@ jobs:
   lint:
     uses: ./.github/workflows/bazel_run_template.yaml
     with:
-      target: ':lint' 
+      target: ':lint'
       args: "--check"
+      uv_sync: true
