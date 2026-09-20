@@ -6,5 +6,12 @@
     },
     "[cpp]": {
         "editor.defaultFormatter": "xaver.clang-format"
-    }
+    },
+    "clangd.arguments": [
+        "--compile-commands-dir=${workspaceFolder}",
+        "--query-driver=**/arm-none-eabi-*,/usr/bin/clang*,/usr/bin/gcc,/usr/bin/g++",
+        "--background-index",
+        "--clang-tidy"
+    ],
+    "C_Cpp.intelliSenseEngine": "disabled"
 }
