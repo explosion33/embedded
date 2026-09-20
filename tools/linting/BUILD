@@ -25,15 +25,23 @@ py_console_script_binary(
     script = "clang-format",
 )
 
+py_console_script_binary(
+    name = "pyright",
+    pkg = "@pypi//pyright",
+    script = "pyright",
+)
+
 py_binary(
     name = "lint",
     srcs = ["lint.py"],
     data = [
         ":clang_format",
+        ":pyright",
         "@pypi//ruff:data",
     ],
     env = {
         "RUFF": "$(rlocationpath @pypi//ruff:data)",
+        "PYRIGHT": "$(rlocationpath :pyright)",
         "CLANG_FORMAT": "$(rlocationpath :clang_format)",
     },
     main = "lint.py",

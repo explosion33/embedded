@@ -32,9 +32,11 @@ def _tool(variable: str) -> str:
 def _python_commands(fix: bool) -> list[list[str]]:
     """Builds command lists python linting"""
     ruff = _tool("RUFF")
+    pyright = _tool("PYRIGHT")
     return [
         [ruff, "check", *([] if fix else ["--no-fix"]), str(WORKSPACE)],
         [ruff, "format", *([] if fix else ["--check"]), str(WORKSPACE)],
+        [pyright],
     ]
 
 
@@ -105,7 +107,7 @@ def _cpp_commands(fix: bool) -> list[list[str]]:
             "--color",
             str(f),
         ]
-        for f in get_repo_files(ACCEPTED_CPP_FILE_EXTENSIONS)
+        for f in get_repo_files(list(ACCEPTED_CPP_FILE_EXTENSIONS))
     ]
 
 
@@ -116,11 +118,16 @@ def cpp_lint(fix: bool) -> bool:
     failed = False
 
     # Repalce / log invalid C++ extensions.
-    if files := get_repo_files(REJECTED_CPP_FILE_EXTENSIONS.keys()):
+    if files := get_repo_files(list(REJECTED_CPP_FILE_EXTENSIONS.keys())):
         click.echo("Found invalid C++ extensions.")
         for f in files:
             if fix:
-                new_ext = REJECTED_CPP_FILE_EXTENSIONS[get_extension(f)]
+                ext = get_extension(f)
+                if ext is None:
+                    raise click.ClickException(f"File {f!s} does not have an extension.")
+                if ext not in REJECTED_CPP_FILE_EXTENSIONS:
+                    raise click.ClickException(f"File {f!s} is not a C/C++ file.")
+                new_ext = REJECTED_CPP_FILE_EXTENSIONS[ext]
                 split = str(f).split(".")
                 split[-1] = new_ext
                 new_name = ".".join(split)
