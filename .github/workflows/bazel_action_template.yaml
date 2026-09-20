@@ -5,7 +5,7 @@ on:
     inputs:
       action:
         required: true
-        type: str
+        type: string
         description: "The bazel action to execute (run, test, build)"
       target:
         required: true
