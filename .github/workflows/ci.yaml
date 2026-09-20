@@ -19,7 +19,7 @@ jobs:
       action: "test"
       target: '//...'
   lint:
-    uses: ./.github/workflows/bazel_run_template.yaml
+    uses: ./.github/workflows/bazel_action_template.yaml
     with:
       action: "run"
       target: ':lint'
