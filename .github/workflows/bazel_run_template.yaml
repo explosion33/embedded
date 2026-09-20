@@ -25,8 +25,8 @@ jobs:
         with:
           bazelisk-cache: true
           # Scoping the disk cache by the test target helps prevent cache conflicts
-          disk-cache: ${{ github.workflow }}-${{ inputs.test_target }}
+          disk-cache: ${{ github.workflow }}-${{ inputs.target }}
           repository-cache: true
 
       - name: Run Bazel tests
-        run: bazel run -c opt ${{ inputs.test_target }} -- ${{ inputs.args }}
+        run: bazel run -c opt ${{ inputs.target }} -- ${{ inputs.args }}
