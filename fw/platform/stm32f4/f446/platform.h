@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-#include "platform/stm32f4/common/uart.h"
+#include "fw/platform/stm32f4/common/uart.h"
 #include "stm32f4xx_ll_bus.h"
 #include "stm32f4xx_ll_gpio.h"
 
