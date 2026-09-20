@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
 
             expected_files = []
 
-            def make(path: pathlib.Path) -> None:
+            def make(path: str) -> None:
                 full = root / path
                 full.touch()
                 if str(path).endswith(".cc") or str(path).endswith(".h"):

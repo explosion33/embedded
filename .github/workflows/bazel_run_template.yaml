@@ -12,6 +12,11 @@ on:
         type: string
         description: "Optional arguments to pass to the bazel invokation"
         default: ""
+      uv_sync:
+        required: false
+        type: boolean
+        description: "Create the uv managed .venv before running, for targets that need it."
+        default: false
 
 jobs:
   run-tests:
@@ -19,6 +24,19 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      # pyright resolves third-party imports through .venv, which lives outside of bazel.
+      - name: Set up uv
+        if: inputs.uv_sync
+        uses: astral-sh/setup-uv@v6
+        with:
+          # Keep in step with the uv pinned in MODULE.bazel.
+          version: "0.12.15"
+          enable-cache: true
+
+      - name: uv Sync
+        if: inputs.uv_sync
+        run: uv sync --locked
 
       - name: Set up Bazel
         uses: bazel-contrib/setup-bazel@0.19.0

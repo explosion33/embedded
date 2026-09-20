@@ -82,14 +82,15 @@ def declared_constraints(patterns: list[str]) -> dict[str, frozenset[str]]:
         bazel("query", f'kind("^({kinds}) rule$", deps({query}))', "--output=xml")
     )
     return {
-        rule.get("name"): frozenset(
-            label.get("value")
+        name: frozenset(
+            value
             for attribute in rule.findall("list[@name='target_compatible_with']")
             for label in attribute
+            if (value := label.get("value"))
         )
         for rule in document.findall("rule")
         # Filter out external C++ files listed by query.
-        if rule.get("name", "").startswith("//")
+        if (name := rule.get("name", "")) and name.startswith("//")
     }
 
 

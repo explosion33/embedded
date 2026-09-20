@@ -9,6 +9,7 @@ dependencies = []
 dev = [
     "click==8.3.0",
     "ruff>=0.15.10",
+    "pyright>=1.1.414",
     "types-pyyaml>=6.0.12.20260408",
     "gitignore-parser==0.1.13",
     # Adds clang-format to the uv.lock allowing bazel rules python to read and use
@@ -34,3 +35,9 @@ select = [
 ]
 # Don't auto-remove imports
 unfixable = ["F401"]
+
+# Configure type checking. Point pyright at the uv-managed venv so third-party imports
+# resolve.
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
