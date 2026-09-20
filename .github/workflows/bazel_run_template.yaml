@@ -20,21 +20,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Mount Bazel Cache
-        uses: actions/cache@v4
+      - name: Set up Bazel
+        uses: bazel-contrib/setup-bazel@0.19.0
         with:
-          path: ~/.cache/bazel
-          # Scoping the cache key by the test target helps prevent cache conflicts
-          key: ${{ runner.os }}-bazel-${{ inputs.test_target }}-${{ hashFiles('**/BUILD', '**/BUILD.bazel', 'WORKSPACE', 'MODULE.bazel') }}
-          restore-keys: |
-            ${{ runner.os }}-bazel-${{ inputs.test_target }}-
-            ${{ runner.os }}-bazel-
-
-      - name: Set up Bazelisk
-        run: |
-          sudo curl -LO "https://github.com"
-          sudo chmod +x bazelisk-linux-amd64
-          sudo mv bazelisk-linux-amd64 /usr/local/bin/bazel
+          bazelisk-cache: true
+          # Scoping the disk cache by the test target helps prevent cache conflicts
+          disk-cache: ${{ github.workflow }}-${{ inputs.test_target }}
+          repository-cache: true
 
       - name: Run Bazel tests
         run: bazel run -c opt ${{ inputs.test_target }} -- ${{ inputs.args }}
