@@ -20,3 +20,8 @@ alias(
     name = "generate_compile_commands",
     actual = "//tools/linting:generate_compile_commands",
 )
+
+alias(
+    name = "lint",
+    actual = "//tools/linting:lint",
+)
