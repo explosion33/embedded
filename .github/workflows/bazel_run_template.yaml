@@ -1,0 +1,32 @@
+name: Bazel Run Template
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        required: true
+        type: string
+        description: "The bazel target string this test invokes (e.g. :target)"
+      args:
+        required: false
+        type: string
+        description: "Optional arguments to pass to the bazel invokation"
+        default: ""
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Bazel
+        uses: bazel-contrib/setup-bazel@0.19.0
+        with:
+          bazelisk-cache: true
+          # Scoping the disk cache by the test target helps prevent cache conflicts
+          disk-cache: ${{ github.workflow }}-${{ inputs.target }}
+          repository-cache: true
+
+      - name: Run Bazel tests
+        run: bazel run -c opt ${{ inputs.target }} -- ${{ inputs.args }}
