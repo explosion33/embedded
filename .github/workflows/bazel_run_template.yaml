@@ -1,0 +1,40 @@
+name: Bazel Run Template
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        required: true
+        type: string
+        description: "The bazel target string this test invokes (e.g. :target)"
+      args:
+        required: false
+        type: string
+        description: "Optional arguments to pass to the bazel invokation"
+        default: ""
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Mount Bazel Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bazel
+          # Scoping the cache key by the test target helps prevent cache conflicts
+          key: ${{ runner.os }}-bazel-${{ inputs.test_target }}-${{ hashFiles('**/BUILD', '**/BUILD.bazel', 'WORKSPACE', 'MODULE.bazel') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-${{ inputs.test_target }}-
+            ${{ runner.os }}-bazel-
+
+      - name: Set up Bazelisk
+        run: |
+          sudo curl -LO "https://github.com"
+          sudo chmod +x bazelisk-linux-amd64
+          sudo mv bazelisk-linux-amd64 /usr/local/bin/bazel
+
+      - name: Run Bazel tests
+        run: bazel run -c opt ${{ inputs.test_target }} -- ${{ inputs.args }}
