@@ -13,7 +13,7 @@ jobs:
     with:
       test_target: '//...'
   lint:
-    uses: ./.github/workflows/bazel_run_template.yml
+    uses: ./.github/workflows/bazel_run_template.yaml
     with:
       target: ':lint' 
       args: "--check"
