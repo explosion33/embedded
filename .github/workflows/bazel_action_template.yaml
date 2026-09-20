@@ -1,8 +1,12 @@
-name: Bazel Run Template
+name: Bazel Action Template
 
 on:
   workflow_call:
     inputs:
+      action:
+        required: true
+        type: str
+        description: "The bazel action to execute (run, test, build)"
       target:
         required: true
         type: string
@@ -46,5 +50,5 @@ jobs:
           disk-cache: ${{ github.workflow }}-${{ inputs.target }}
           repository-cache: true
 
-      - name: Run Bazel tests
-        run: bazel run -c opt ${{ inputs.target }} -- ${{ inputs.args }}
+      - name: Perform Bazel Action
+        run: bazel ${{ inputs.action }} -c opt ${{ inputs.target }} --test_output=errors -- ${{ inputs.args }}
