@@ -11,7 +11,8 @@
         "--compile-commands-dir=${workspaceFolder}",
         "--query-driver=**/arm-none-eabi-*,/usr/bin/clang*,/usr/bin/gcc,/usr/bin/g++",
         "--background-index",
-        "--clang-tidy"
+        "--clang-tidy",
+        "--log=error"
     ],
     "C_Cpp.intelliSenseEngine": "disabled",
     "[python]": {
@@ -20,5 +21,17 @@
             "source.fixAll": "explicit",
             "source.organizeImports": "explicit"
         }
+    },
+    "files.watcherExclude": {
+        "**/bazel-*/**": true,
+        "**/.venv/**": true,
+        "**/external/**": true,
+        "**/.cache/**": true
+    },
+    "search.exclude": {
+        "**/bazel-*/**": true,
+        "**/.venv/**": true,
+        "**/external/**": true,
+        "**/.cache/**": true
     }
 }
