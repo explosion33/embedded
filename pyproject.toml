@@ -12,6 +12,7 @@ dev = [
     "pyright>=1.1.414",
     "types-pyyaml>=6.0.12.20260408",
     "gitignore-parser==0.1.13",
+    "pyocd==0.45.1",
     # Adds clang-format to the uv.lock allowing bazel rules python to read and use
     # these packages.
     "clang-format==23.1.1",
