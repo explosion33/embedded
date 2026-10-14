@@ -4,6 +4,7 @@
 
 #include <cstdint>
 
+#include "fw/platform/stm32f4/common/gpio.h"
 #include "fw/platform/stm32f4/common/uart.h"
 #include "stm32f4xx_ll_bus.h"
 #include "stm32f4xx_ll_gpio.h"
@@ -27,6 +28,18 @@ constexpr UartConfig kConsoleUart = {
     .rx_pin = LL_GPIO_PIN_3,
     .alternate = LL_GPIO_AF_7,
     .baud_rate = 115200,
+};
+
+// The user LED, LD2 on a Nucleo-F446RE, on PA5.
+// TODO: Board specific, see kConsoleUart.
+// Onboard LED, LD2 on a Nucleo-F446RE (PA5).
+// TODO: This definition should not live here. This is STM32F446 generic code,
+// but assumes device specifc. Additional per-device targets should be created
+// and maintained.
+constexpr OutputPinConfig kUserLed = {
+    .port = GPIOA,
+    .port_clock = LL_AHB1_GRP1_PERIPH_GPIOA,
+    .pin = LL_GPIO_PIN_5,
 };
 
 // Waits roughly `iterations` cycles.

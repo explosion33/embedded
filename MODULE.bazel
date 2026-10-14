@@ -9,6 +9,8 @@ CMSIS_DEVICE_F4_VERSION = "2.6.11"
 
 STM32F4XX_HAL_DRIVER_VERSION = "1.8.5"
 
+FREERTOS_KERNEL_VERSION = "11.3.1"
+
 BAZEL_COMPILE_COMMANDS_VERSION = "0.22.4"
 
 # PyOCD Flashing Target Pack versions. 
@@ -103,6 +105,15 @@ http_archive(
     sha256 = "1d792fa91a15531b181aadbbd794e7c086650036406ad71932507f0cc8b7ca56",
     strip_prefix = "stm32f4xx-hal-driver-%s" % STM32F4XX_HAL_DRIVER_VERSION,
     url = "https://github.com/STMicroelectronics/stm32f4xx_hal_driver/archive/refs/tags/v%s.tar.gz" % STM32F4XX_HAL_DRIVER_VERSION,
+)
+
+# Fetch the FreeRTOS kernel.
+http_archive(
+    name = "freertos_kernel",
+    build_file = "//fw/platform/external:freertos_kernel.BUILD",
+    sha256 = "da9c9567368db9b2f1d053a344e7892587af6ee50398f0f14fba53405cc7c041",
+    strip_prefix = "FreeRTOS-Kernel-%s" % FREERTOS_KERNEL_VERSION,
+    url = "https://github.com/FreeRTOS/FreeRTOS-Kernel/archive/refs/tags/V%s.tar.gz" % FREERTOS_KERNEL_VERSION,
 )
 
 http_archive(

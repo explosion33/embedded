@@ -7,3 +7,14 @@ cc_fw_app(
     platform = "//fw/platform/stm32f4/f446:platform",
     deps = ["//fw/platform/stm32f4/f446"],
 )
+
+cc_fw_app(
+    name = "rtos_demo",
+    srcs = ["rtos_demo.cc"],
+    linker_script = "//fw/platform/stm32f4/f446:stm32f446re.ld",
+    platform = "//fw/platform/stm32f4/f446:platform",
+    deps = [
+        "//fw/platform/stm32f4/common:freertos",
+        "//fw/platform/stm32f4/f446",
+    ],
+)
