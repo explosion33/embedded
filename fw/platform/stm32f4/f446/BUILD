@@ -12,6 +12,18 @@ platform(
         "//fw/platform/constraints:cortex_m4f",
         "//fw/platform/constraints:stm32f446",
     ],
+    flags = [
+        "--@freertos_kernel//:config=//fw/platform/stm32f4/f446:freertos_config",
+    ],
+)
+
+# Provides FreeRTOSConfig.h to the FreeRTOS kernel, via the flag set above.
+cc_library(
+    name = "freertos_config",
+    hdrs = ["freertos/FreeRTOSConfig.h"],
+    strip_include_prefix = "freertos",
+    target_compatible_with = ["//fw/platform/constraints:stm32f446"],
+    deps = ["//fw/platform/stm32f4/common:freertos_config_stm32f4"],
 )
 
 cc_library(
@@ -21,6 +33,7 @@ cc_library(
     target_compatible_with = ["//fw/platform/constraints:stm32f446"],
     deps = [
         "//fw/platform/stm32f4/common:crt_stubs",
+        "//fw/platform/stm32f4/common:gpio",
         "//fw/platform/stm32f4/common:ll",
         "//fw/platform/stm32f4/common:uart",
     ],

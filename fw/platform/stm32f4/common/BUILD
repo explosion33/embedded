@@ -60,3 +60,31 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [":ll"],
 )
+
+cc_library(
+    name = "gpio",
+    srcs = ["gpio.cc"],
+    hdrs = ["gpio.h"],
+    target_compatible_with = TARGET_COMPATIBLE_WITH,
+    visibility = ["//visibility:public"],
+    deps = [":ll"],
+)
+
+cc_library(
+    name = "freertos_config_stm32f4",
+    hdrs = ["freertos/stm32f4_freertos_config.h"],
+    target_compatible_with = TARGET_COMPATIBLE_WITH,
+    deps = [":cmsis"],
+)
+
+cc_library(
+    name = "freertos",
+    srcs = [
+        "freertos/freertos_heap.cc",
+        "freertos/freertos_hooks.cc",
+    ],
+    target_compatible_with = TARGET_COMPATIBLE_WITH,
+    visibility = ["//visibility:public"],
+    deps = ["@freertos_kernel//:freertos"],
+    alwayslink = True,
+)
