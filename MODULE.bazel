@@ -11,6 +11,9 @@ STM32F4XX_HAL_DRIVER_VERSION = "1.8.5"
 
 BAZEL_COMPILE_COMMANDS_VERSION = "0.22.4"
 
+# PyOCD Flashing Target Pack versions. 
+STM32F4XX_DFP_VERSION = "3.1.1"
+
 module(
     name = "embedded",
     version = "0.1.0",
@@ -57,6 +60,15 @@ pip.parse(
 use_repo(pip, "pypi")
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+# Fetch the CMSIS Device Family Pack used by pyOCD to describe STM32F4 targets.
+http_file(
+    name = "stm32f4xx_dfp",
+    downloaded_file_path = "STM32F4xx_DFP.pack",
+    sha256 = "345231106fe697df24bbe9133aeeec1b0383d7891c4adf4f47bbb8b478e9f2f0",
+    urls = ["https://www.keil.com/pack/Keil.STM32F4xx_DFP.%s.pack" % STM32F4XX_DFP_VERSION],
+)
 
 # Fetch the bare-metal arm cross compiler.
 http_archive(

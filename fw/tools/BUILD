@@ -5,9 +5,11 @@ py_binary(
     name = "flash",
     srcs = ["flash.py"],
     main = "flash.py",
+    data = ["@stm32f4xx_dfp//file"],
     visibility = ["//visibility:public"],
     deps = [
         "@pypi//click",
         "@pypi//pyocd",
+        "@rules_python//python/runfiles",
     ],
 )
