@@ -1,10 +1,14 @@
 import dataclasses
+import os
 import pathlib
 
 import click
 from pyocd.core import helpers, session
 from pyocd.flash.file_programmer import FileProgrammer
 from pyocd.probe import debug_probe
+from python.runfiles import runfiles  # pyright: ignore[reportMissingImports]
+
+WORKING_DIRECTORY = pathlib.Path(os.environ.get("BUILD_WORKING_DIRECTORY", os.getcwd()))
 
 
 def get_default_base(target: str) -> int | None:
@@ -85,7 +89,21 @@ def flash(config: FlashConfig):
     if config.verbose:
         print(f"Connection to DebugProbe with config: {config}")
 
-    probe_session = session.Session(config.probe, target_override=config.target)
+    binary_path = config.binary
+    if not binary_path.is_absolute():
+        binary_path = WORKING_DIRECTORY / binary_path
+    binary_path = binary_path.resolve()
+
+    # TODO: If multiple packs need to be added re-work this script to auto-discover.
+    pack_path = runfiles.Create().Rlocation("stm32f4xx_dfp/file/STM32F4xx_DFP.pack")
+    if pack_path is None:
+        raise RuntimeError("Could not locate the STM32F4 CMSIS Device Family Pack.")
+
+    probe_session = session.Session(
+        config.probe,
+        target_override=config.target,
+        pack=[pack_path],
+    )
     if probe_session is None:
         raise RuntimeError("Could not connect to provided debug probe.")
 
@@ -102,7 +120,7 @@ def flash(config: FlashConfig):
 
         if config.verbose:
             print("Flashing binary")
-        programmer.program(str(config.binary), base_address=config.flash_address)
+        programmer.program(str(binary_path), base_address=config.flash_address)
 
         if config.verbose:
             print("Flashing Complete")
