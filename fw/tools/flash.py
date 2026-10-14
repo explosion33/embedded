@@ -6,7 +6,7 @@ import click
 from pyocd.core import helpers, session
 from pyocd.flash.file_programmer import FileProgrammer
 from pyocd.probe import debug_probe
-from python.runfiles import runfiles
+from python.runfiles import runfiles  # pyright: ignore[reportMissingImports]
 
 WORKING_DIRECTORY = pathlib.Path(os.environ.get("BUILD_WORKING_DIRECTORY", os.getcwd()))
 
