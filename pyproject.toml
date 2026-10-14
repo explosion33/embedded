@@ -42,3 +42,11 @@ unfixable = ["F401"]
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*",
+    "bazel-*",
+    "external",
+    ".venv",
+]
