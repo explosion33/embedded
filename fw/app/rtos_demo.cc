@@ -1,13 +1,14 @@
 // Runs two FreeRTOS tasks: one blinks the user LED, the other reports uptime
 // and stack usage over the console once a second.
 
-#include <atomic>
-#include <cstdint>
 #include <cstdio>
+#include <string_view>
 
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "fw/os/thread.h"
+#include "fw/platform/stm32f4/common/freertos/stm32f4_freertos_config.h"
 #include "fw/platform/stm32f4/common/gpio.h"
 #include "fw/platform/stm32f4/common/uart.h"
 #include "fw/platform/stm32f4/f446/platform.h"
@@ -19,13 +20,8 @@ namespace {
 constexpr size_t kBlinkPeriod = 250;
 constexpr size_t kLogPeriod = 1000;
 
-// Stack depths are in words. The console task's is larger because snprintf
-// uses a lot of stack.
-constexpr configSTACK_DEPTH_TYPE kBlinkStackDepth = configMINIMAL_STACK_SIZE;
-constexpr configSTACK_DEPTH_TYPE kConsoleStackDepth = 512;
-
 // Blinks the UserLED at `kBlinkPeriod`.
-void BlinkTask(void* arg) {
+void BlinkTask() {
   platform::OutputPin led(platform::kUserLed);
   while (true) {
     led.Toggle();
@@ -33,34 +29,23 @@ void BlinkTask(void* arg) {
   }
 }
 
-// The only task that formats text or touches the console, since newlib is not
-// configured to be reentrant.
-
 // Repeatedly writes hello_world to the console at `kLogPeriod`.
-void ConsoleTask(void* arg) {
+void ConsoleTask(std::string_view base) {
   platform::Uart console(platform::kConsoleUart);
 
-  // Base message + trailing incrementing digits + \r\n.
-  constexpr char kBaseStr[] = "Hello World ";
-  constexpr size_t kNumDigits = 3;
-  constexpr size_t kTotalBytes = sizeof(kBaseStr) + kNumDigits + 2;
+  constexpr size_t kMaxDigits = 3;
+  constexpr size_t kMaxValue = 1000;
 
-  static_assert(kNumDigits > 0);
-  size_t max_count = 9;
-  for (size_t i = 0; i < kNumDigits - 1; i++) {
-    max_count *= 10;
-    max_count += 9;
-  }
+  // Base + " " + digits + "\r\n";
+  const size_t size = base.size() + kMaxDigits + 3;
+  char* text = new char[size];
 
-  char text[kTotalBytes];
-  size_t count = 0;
+  uint32_t count = 0;
   while (true) {
-    snprintf(text, sizeof(text), "%s%d\r\n", kBaseStr, count);
+    snprintf(text, size, "%s %d\r\n", base.cbegin(), count);
     console.Write(text);
-
     count++;
-    count %= max_count;
-
+    count %= kMaxValue;
     vTaskDelay(kLogPeriod);
   }
 }
@@ -68,11 +53,16 @@ void ConsoleTask(void* arg) {
 }  // namespace
 
 int main() {
-  configASSERT(xTaskCreate(BlinkTask, "blink", kBlinkStackDepth, nullptr, 0,
-                           nullptr) == pdPASS);
+  {
+    fw::os::Thread thread;
+    configASSERT(thread.Start(&BlinkTask));
+  }
 
-  configASSERT(xTaskCreate(ConsoleTask, "console", kConsoleStackDepth, nullptr,
-                           0, nullptr) == pdPASS);
+  {
+    fw::os::Thread thread;
+    thread.SetStackDepth(2048);
+    configASSERT(thread.Start(&ConsoleTask, "Hello World"));
+  }
 
   vTaskStartScheduler();
   configASSERT(false);
