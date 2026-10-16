@@ -96,6 +96,9 @@ cc_library(
     ],
     target_compatible_with = TARGET_COMPATIBLE_WITH,
     visibility = ["//visibility:public"],
-    deps = ["@freertos_kernel//:freertos"],
+    deps = [
+        "//fw/log",
+        "@freertos_kernel//:freertos",
+    ],
     alwayslink = True,
 )
