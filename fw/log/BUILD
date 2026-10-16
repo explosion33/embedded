@@ -12,6 +12,16 @@ cc_library(
 )
 
 cc_library(
+    name = "check",
+    srcs = ["check.cc"],
+    hdrs = ["check.h"],
+    deps = [
+        ":headers",
+        ":log",
+    ],
+)
+
+cc_library(
     name = "headers",
     hdrs = [
         "backend.h",
