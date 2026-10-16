@@ -1,18 +1,16 @@
 #pragma once
 
+#include <cstddef>
 #include <tuple>
+#include <utility>
 
-#include "FreeRTOS.h"
-#include "task.h"
+#include "fw/log/check.h"
+#include "fw/os/task_wrapper.h"
 
 namespace fw::os {
 
 // Implements a C++ style thread wrapping FreeRTOS tasks.
-// TODO: Update code to LOG(FATAL) instead of returning false for programming
-// errors.
 // TODO: Add more features: join, cancel, status, etc.
-// TODO: It might be possible to be possible to hide the FreeRTOS dependency
-// with a wrapper class: Thread.h -> Task.h -> Task.cc -> FreeRTOS calls.
 class Thread {
  public:
   Thread() = default;
@@ -20,65 +18,45 @@ class Thread {
   Thread& operator=(const Thread&) = delete;
 
   // Sets the stack depth for the thread in bytes.
-  bool SetStackDepth(size_t depth) {
-    if (handle_ != nullptr) {
-      return false;
-    }
-
-    if (depth % sizeof(StackType_t) != 0) {
-      return false;
-    }
-
-    depth /= sizeof(StackType_t);
-
-    if (stack_depth_ == 0) {
-      return false;
-    }
-
+  void SetStackDepth(size_t depth) {
+    CHECK(!spawned_);
     stack_depth_ = depth;
-    return true;
   }
 
   // Sets the priority for the given task, 0 being the lowest.
-  bool SetPriority(size_t priority) {
-    if (handle_ != nullptr) {
-      return false;
-    }
-
-    if (priority >= configMAX_PRIORITIES) {
-      return false;
-    }
-
+  void SetPriority(size_t priority) {
+    CHECK(!spawned_);
     priority_ = priority;
-    return true;
   }
 
   // Runs the provided function in the thread with the provided arguments.
   // Can only be called once.
   template <typename Fn, typename... Args>
-  bool Start(Fn fn, Args... args) {
-    // Cannot start a new task if the current task is in progress.
-    if (handle_ != nullptr) {
-      // TODO: Replace with LOG(FATAL).
-      return false;
-    }
+  void Start(Fn fn, Args... args) {
+    CHECK(!spawned_);
 
     // Convert the args and the function call into a single payload struct.
-    auto* payload = new Payload<Fn, Args...>{
+    using TypedPayload = Payload<Fn, Args...>;
+    TypedPayload* payload = new TypedPayload{
         std::move(fn), std::tuple<Args...>(std::move(args)...)};
-    if (payload == nullptr) {
-      return false;
-    }
+    CHECK(payload != nullptr);
 
-    // Start the wrapper task, the wrapper task decodes and executes the
-    // payload.
-    if (xTaskCreate(&Entry<Payload<Fn, Args...>>, "", stack_depth_, payload,
-                    priority_, &handle_) != pdPASS) {
-      delete payload;
-      handle_ = nullptr;
-      return false;
-    }
-    return true;
+    const auto entry = [](void* arg) {
+      TypedPayload* heap = static_cast<TypedPayload*>(arg);
+      TypedPayload local(std::move(*heap));
+      delete heap;
+      std::apply(local.fn, std::move(local.args));
+      internal::ExitCurrentTask();
+    };
+
+    internal::CreateTask(internal::TaskConfig{
+        .fn = entry,
+        .arg = payload,
+        .name = "",
+        .stack_depth_bytes = stack_depth_,
+        .priority = priority_,
+    });
+    spawned_ = true;
   }
 
  private:
@@ -89,25 +67,14 @@ class Thread {
     std::tuple<Args...> args;
   };
 
-  // FreeRTOS formatted entry task. Unpacks the payload, executes it, and then
-  // cleans up the task.
-  template <typename P>
-  static void Entry(void* param) {
-    P* heap = static_cast<P*>(param);
-    P local(std::move(*heap));
-    delete heap;
-    std::apply(local.fn, std::move(local.args));
-    vTaskDelete(nullptr);
-  }
-
   // The stack depth of the next spawned task.
-  size_t stack_depth_ = configMINIMAL_STACK_SIZE;
+  size_t stack_depth_ = internal::GetMinimalStackSize();
 
   // The priority of the next spawned task.
   size_t priority_ = 0;
 
-  // The handle to the current task.
-  TaskHandle_t handle_ = nullptr;
+  // True if this thread has been spawned.
+  bool spawned_ = false;
 };
 
 }  // namespace fw::os

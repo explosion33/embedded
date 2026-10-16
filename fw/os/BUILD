@@ -8,7 +8,8 @@ cc_library(
     target_compatible_with = ["@platforms//os:none"],
     deps = [
         ":main",  # Link main so os apps can't redifine main.
-        "@freertos_kernel//:freertos",
+        ":task_wrapper",
+        "//fw/log:check",
     ],
 )
 
@@ -19,6 +20,17 @@ cc_library(
     target_compatible_with = ["@platforms//os:none"],
     deps = [
         ":main",  # Link main so os apps can't redifine main.
+        "//fw/log:check",
+        "@freertos_kernel//:freertos",
+    ],
+)
+
+cc_library(
+    name = "task_wrapper",
+    srcs = ["task_wrapper.cc"],
+    hdrs = ["task_wrapper.h"],
+    target_compatible_with = ["@platforms//os:none"],
+    deps = [
         "//fw/log:check",
         "@freertos_kernel//:freertos",
     ],

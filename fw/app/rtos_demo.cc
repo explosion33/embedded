@@ -54,13 +54,12 @@ void ConsoleTask(std::string_view base) {
 void fw::os::AppMain() {
   {
     fw::os::Thread thread;
-    CHECK(thread.Start(&BlinkTask)) << "Failed to start blink thread.";
+    thread.Start(&BlinkTask);
   }
 
   {
     fw::os::Thread thread;
     thread.SetStackDepth(2048);
-    CHECK(thread.Start(&ConsoleTask, "Hello World"))
-        << "Failed to start console thread.";
+    thread.Start(&ConsoleTask, "Hello World");
   }
 }
