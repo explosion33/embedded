@@ -7,6 +7,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "fw/os/main.h"
 #include "fw/os/thread.h"
 #include "fw/platform/stm32f4/common/freertos/stm32f4_freertos_config.h"
 #include "fw/platform/stm32f4/common/gpio.h"
@@ -52,7 +53,7 @@ void ConsoleTask(std::string_view base) {
 
 }  // namespace
 
-int main() {
+void fw::os::AppMain() {
   {
     fw::os::Thread thread;
     configASSERT(thread.Start(&BlinkTask));
@@ -63,7 +64,4 @@ int main() {
     thread.SetStackDepth(2048);
     configASSERT(thread.Start(&ConsoleTask, "Hello World"));
   }
-
-  vTaskStartScheduler();
-  configASSERT(false);
 }
