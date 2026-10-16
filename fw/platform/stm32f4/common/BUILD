@@ -62,6 +62,17 @@ cc_library(
 )
 
 cc_library(
+    name = "halt",
+    srcs = ["halt.cc"],
+    target_compatible_with = TARGET_COMPATIBLE_WITH,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":ll",
+        "//fw/log:headers",
+    ],
+)
+
+cc_library(
     name = "gpio",
     srcs = ["gpio.cc"],
     hdrs = ["gpio.h"],
