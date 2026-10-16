@@ -6,6 +6,7 @@
 
 #include "FreeRTOS.h"
 
+#include "fw/log/log.h"
 #include "fw/os/main.h"
 #include "fw/os/thread.h"
 #include "fw/os/time.h"
@@ -55,12 +56,16 @@ void ConsoleTask(std::string_view base) {
 void fw::os::AppMain() {
   {
     fw::os::Thread thread;
-    configASSERT(thread.Start(&BlinkTask));
+    if (!thread.Start(&BlinkTask)) {
+      LOG_FATAL("Failed to start blink thread.");
+    };
   }
 
   {
     fw::os::Thread thread;
     thread.SetStackDepth(2048);
-    configASSERT(thread.Start(&ConsoleTask, "Hello World"));
+    if (!thread.Start(&ConsoleTask, "Hello World")) {
+      LOG_FATAL("Failed to start console thread.");
+    }
   }
 }

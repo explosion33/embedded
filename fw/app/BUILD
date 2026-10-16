@@ -14,6 +14,7 @@ cc_fw_app(
     linker_script = "//fw/platform/stm32f4/f446:stm32f446re.ld",
     platform = "//fw/platform/stm32f4/f446:platform",
     deps = [
+        "//fw/log",
         "//fw/os:thread",
         "//fw/os:time",
         "//fw/platform/stm32f4/common:freertos",
