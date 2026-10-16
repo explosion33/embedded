@@ -19,6 +19,7 @@ cc_library(
     target_compatible_with = ["@platforms//os:none"],
     deps = [
         ":main",  # Link main so os apps can't redifine main.
+        "//fw/log:check",
         "@freertos_kernel//:freertos",
     ],
 )
