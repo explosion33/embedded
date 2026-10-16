@@ -108,7 +108,7 @@ def cc_fw_app(
     cc_binary(
         name = elf_name,
         srcs = srcs,
-        deps = deps,
+        deps = deps + ["//fw/base:newlib_stubs"],
         additional_linker_inputs = [linker_script],
         features = ["generate_linkmap"],
         linkopts = [

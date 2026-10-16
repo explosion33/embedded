@@ -4,6 +4,7 @@
 #include <cstdarg>
 #include <cstddef>
 #include <cstdio>
+#include <cstring>
 #include <string_view>
 
 #include "fw/log/backend.h"
@@ -43,6 +44,24 @@ constexpr size_t kMaxMessageSize = 256;
   backend::Write(std::string_view(message, size));
   backend::Write("\r\n");
   backend::Halt();
+}
+
+void LogInfoBlocking(const char* fmt, ...) {
+  va_list args;
+  va_list args2;
+  va_start(args, fmt);
+  va_copy(args2, args);
+  const size_t size = vsnprintf(nullptr, 0, fmt, args);
+  va_end(args);
+
+  char* buf = new char[size + 1];
+  vsnprintf(buf, size + 1, fmt, args2);
+  backend::Write("INFO: ");
+  backend::Write(std::string_view(buf, size));
+  backend::Write("\r\n");
+  delete[] buf;
+
+  va_end(args2);
 }
 
 }  // namespace fw::log::internal

@@ -2,9 +2,10 @@
 // and stack usage over the console once a second.
 
 #include <cstdio>
+#include <string>
 #include <string_view>
 
-#include "fw/log/check.h"
+#include "fw/log/log.h"
 #include "fw/os/main.h"
 #include "fw/os/thread.h"
 #include "fw/os/time.h"
@@ -12,8 +13,6 @@
 #include "fw/platform/stm32f4/common/uart.h"
 #include "fw/platform/stm32f4/f446/platform.h"
 
-// TODO: Replace the raw FreeRTOS API with the OS abstraction layer once it
-// exists.
 namespace {
 
 constexpr size_t kBlinkPeriodMs = 250;
@@ -30,21 +29,13 @@ void BlinkTask() {
 
 // Repeatedly writes hello_world to the console at `kLogPeriod`.
 void ConsoleTask(std::string_view base) {
+  const std::string base_str(base);
   platform::Uart console(platform::kConsoleUart);
-
-  constexpr size_t kMaxDigits = 3;
-  constexpr size_t kMaxValue = 1000;
-
-  // Base + " " + digits + "\r\n";
-  const size_t size = base.size() + kMaxDigits + 3;
-  char* text = new char[size];
 
   uint32_t count = 0;
   while (true) {
-    snprintf(text, size, "%s %d\r\n", base.cbegin(), count);
-    console.Write(text);
+    LOG_INFO_BLOCKING("%s %d", base_str.c_str(), count);
     count++;
-    count %= kMaxValue;
     fw::os::Delay(kLogPeriodMs);
   }
 }
