@@ -15,6 +15,7 @@ cc_fw_app(
     platform = "//fw/platform/stm32f4/f446:platform",
     deps = [
         "//fw/os:thread",
+        "//fw/os:time",
         "//fw/platform/stm32f4/common:freertos",
         "//fw/platform/stm32f4/f446",
     ],

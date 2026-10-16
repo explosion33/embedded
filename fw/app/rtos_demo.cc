@@ -5,11 +5,10 @@
 #include <string_view>
 
 #include "FreeRTOS.h"
-#include "task.h"
 
 #include "fw/os/main.h"
 #include "fw/os/thread.h"
-#include "fw/platform/stm32f4/common/freertos/stm32f4_freertos_config.h"
+#include "fw/os/time.h"
 #include "fw/platform/stm32f4/common/gpio.h"
 #include "fw/platform/stm32f4/common/uart.h"
 #include "fw/platform/stm32f4/f446/platform.h"
@@ -18,15 +17,15 @@
 // exists.
 namespace {
 
-constexpr size_t kBlinkPeriod = 250;
-constexpr size_t kLogPeriod = 1000;
+constexpr size_t kBlinkPeriodMs = 250;
+constexpr size_t kLogPeriodMs = 1000;
 
 // Blinks the UserLED at `kBlinkPeriod`.
 void BlinkTask() {
   platform::OutputPin led(platform::kUserLed);
   while (true) {
     led.Toggle();
-    vTaskDelay(kBlinkPeriod);
+    fw::os::Delay(kBlinkPeriodMs);
   }
 }
 
@@ -47,7 +46,7 @@ void ConsoleTask(std::string_view base) {
     console.Write(text);
     count++;
     count %= kMaxValue;
-    vTaskDelay(kLogPeriod);
+    fw::os::Delay(kLogPeriodMs);
   }
 }
 
