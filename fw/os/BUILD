@@ -13,6 +13,17 @@ cc_library(
 )
 
 cc_library(
+    name = "time",
+    srcs = ["time.cc"],
+    hdrs = ["time.h"],
+    target_compatible_with = ["@platforms//os:none"],
+    deps = [
+        ":main",  # Link main so os apps can't redifine main.
+        "@freertos_kernel//:freertos",
+    ],
+)
+
+cc_library(
     name = "main",
     srcs = ["main.cc"],
     hdrs = ["main.h"],

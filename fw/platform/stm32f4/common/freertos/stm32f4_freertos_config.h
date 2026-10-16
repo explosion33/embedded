@@ -12,6 +12,8 @@
 // Reference:
 // https://www.freertos.org/Documentation/02-Kernel/03-Supported-devices/02-Customization
 
+// Point auto-include to target agnostic FreeRTOS.h include.
+// IWYU pragma: private, include "FreeRTOS.h"
 #include "stm32f4xx.h"
 
 // ---------------------------------------------------------------------------
