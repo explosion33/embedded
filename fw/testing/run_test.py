@@ -49,8 +49,8 @@ def _get_text(text: str, prefix: str, suffix: str | None = None) -> str | None:
     "--negative", required=False, type=bool, default=False, help="Passes the test on test failure."
 )
 def main(binary_rlocation: str, target: str, negative: bool):
-    pass_word = TEST_FAIL if negative else TEST_PASS
-    fail_word = TEST_PASS if negative else TEST_FAIL
+    pass_code = 1 if negative else 0
+    fail_code = 0 if negative else 1
 
     binary_path = runfiles.Create().Rlocation(binary_rlocation)
     if binary_path is None:
@@ -64,13 +64,13 @@ def main(binary_rlocation: str, target: str, negative: bool):
             text += ser.readline().decode("utf-8").strip()
 
             if msg := _get_text(text, TEST_PREFIX, TEST_SUFFIX):
-                if pass_word in msg:
+                if TEST_PASS in msg:
                     print("Test Passed!")
-                    sys.exit()
-                elif fail_msg := _get_text(msg, fail_word):
+                    sys.exit(pass_code)
+                elif fail_msg := _get_text(msg, TEST_FAIL):
                     print("Test Failed!")
                     print(fail_msg)
-                    sys.exit(1)
+                    sys.exit(fail_code)
                 else:
                     print(msg)
                 text = ""
