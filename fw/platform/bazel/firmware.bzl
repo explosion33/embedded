@@ -62,9 +62,15 @@ _platform_transition = transition(
 )
 
 def _fw_image_impl(ctx):
-    return [DefaultInfo(files = depset(
-        transitive = [src[DefaultInfo].files for src in ctx.attr.srcs],
-    ))]
+    outs = {}
+    for src in ctx.files.srcs:
+        out = ctx.actions.declare_file(ctx.label.name + "/" + src.basename)
+        ctx.actions.symlink(output = out, target_file = src)
+        outs[out.extension] = out
+    return [
+        DefaultInfo(files = depset(outs.values())),
+        OutputGroupInfo(**{ext: depset([f]) for ext, f in outs.items()}),
+    ]
 
 _fw_image = rule(
     implementation = _fw_image_impl,
