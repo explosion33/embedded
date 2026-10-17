@@ -9,15 +9,3 @@ cc_library(
     hdrs = ["test.h"],
     deps = ["//fw/log"],
 )
-
-# TODO: Replace with a dedicated cc_fw_test once it exists.
-cc_fw_app(
-    name = "pass_test",
-    srcs = ["pass_test.cc"],
-    board = "//fw/boards/nucleo_f446re",
-    deps = [
-        "//fw/os:main",
-        "//fw/platform/stm32f4/common:freertos",
-        "//fw/testing:test",
-    ],
-)
