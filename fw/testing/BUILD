@@ -28,6 +28,7 @@ cc_fw_test(
     name = "fail_test",
     srcs = ["fail_test.cc"],
     board = "//fw/boards/nucleo_f446re",
+    negative = True,
     target = "STM32F4",
     deps = [
         "//fw/os:main",

@@ -11,6 +11,7 @@ def cc_fw_test(
         target,
         srcs = [],
         deps = [],
+        negative = False,
         **kwargs):
     """Compiles, flashes, and records responses for a test. The test must use the provided test harness.
 
@@ -23,6 +24,7 @@ def cc_fw_test(
       srcs: C/C++/assembly sources.
       **kwargs: Args passed through to the underyling binary.
       deps: cc_library/binary dependencies for this app.
+      negative: If true, a test failure reports as Test Passed.
     """
     image = name + "_image"
     cc_fw_app(name = image, board = board, srcs = srcs, deps = deps)
@@ -43,6 +45,8 @@ def cc_fw_test(
             "$(rlocationpath  :%s_bin)" % name,
             "--target",
             target,
+            "--negative",
+            str(negative),
         ],
         deps = [
             "//fw/tools:flash",

@@ -45,7 +45,13 @@ def _get_text(text: str, prefix: str, suffix: str | None = None) -> str | None:
     type=str,
     help="The target of the device to autodetect and flash too.",
 )
-def main(binary_rlocation: str, target: str):
+@click.option(
+    "--negative", required=False, type=bool, default=False, help="Passes the test on test failure."
+)
+def main(binary_rlocation: str, target: str, negative: bool):
+    pass_word = TEST_FAIL if negative else TEST_PASS
+    fail_word = TEST_PASS if negative else TEST_FAIL
+
     binary_path = runfiles.Create().Rlocation(binary_rlocation)
     if binary_path is None:
         raise click.ClickException(f"Could not find '{binary_rlocation}' in runfiles.")
@@ -58,10 +64,10 @@ def main(binary_rlocation: str, target: str):
             text += ser.readline().decode("utf-8").strip()
 
             if msg := _get_text(text, TEST_PREFIX, TEST_SUFFIX):
-                if TEST_PASS in msg:
+                if pass_word in msg:
                     print("Test Passed!")
                     sys.exit()
-                elif fail_msg := _get_text(msg, TEST_FAIL):
+                elif fail_msg := _get_text(msg, fail_word):
                     print("Test Failed!")
                     print(fail_msg)
                     sys.exit(1)
