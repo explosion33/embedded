@@ -116,6 +116,8 @@ def flash(config: FlashConfig):
         if config.verbose:
             print(f"Connected to probe with target {target.part_number}")
 
+        target.reset_and_halt()
+
         programmer = FileProgrammer(probe_session)
 
         if config.verbose:
@@ -131,19 +133,7 @@ def flash(config: FlashConfig):
             target.reset()
 
 
-@click.command()
-@click.argument(
-    "binary_path",
-    required=True,
-    type=pathlib.Path,
-)
-@click.option(
-    "--target",
-    required=True,
-    type=str,
-    help="The target of the device to autodetect and flash too.",
-)
-def main(binary_path: pathlib.Path, target: str):
+def flash_from(binary_path: pathlib.Path, target: str):
     """
     Flashes the binary at the provided path to the first debug probe found that
     matches the provided target.
@@ -175,6 +165,22 @@ def main(binary_path: pathlib.Path, target: str):
 
     # assert_reset
     # reset
+
+
+@click.command()
+@click.argument(
+    "binary_path",
+    required=True,
+    type=pathlib.Path,
+)
+@click.option(
+    "--target",
+    required=True,
+    type=str,
+    help="The target of the device to autodetect and flash too.",
+)
+def main(binary_path: pathlib.Path, target: str):
+    flash_from(binary_path, target)
 
 
 if __name__ == "__main__":

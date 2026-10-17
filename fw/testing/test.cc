@@ -35,6 +35,7 @@ void LogImpl(std::string_view msg, LogType type) {
   }
   STRING_LOG(msg);
   STRING_LOG(kTestSuffix);
+  LOG_BLOCKING("\r\n");
 }
 
 }  // namespace
