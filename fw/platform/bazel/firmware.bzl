@@ -84,36 +84,31 @@ _fw_image = rule(
 
 def cc_fw_app(
         name,
-        linker_script,
-        platform,
+        board,
         srcs = [],
         deps = [],
-        linkopts = [],
         target_compatible_with = ["@platforms//os:none"],
         **kwargs):
     """Builds a flashable firmware image. Produces .bin .elf and .map files.
 
     Args:
       name: Name of the firmware image.
-      linker_script: The linker script describing the part's memory map.
-      platform: The platform to cross compile this app for.
+      board: The board package to build for, defined in //fw/boards/. The board
+        package must provide a `:platform` to compile for, startup code, and
+        linker script.
       srcs: C/C++/assembly sources.
       deps: cc_library/binary dependencies for this app.
-      linkopts: Extra linker flags.
       target_compatible_with: Platforms the .elf and .bin can be built for.
       **kwargs: Args passed through to the underyling binary.
     """
+    board_label = native.package_relative_label(board)
     elf_name = name + ".elf"
 
     cc_binary(
         name = elf_name,
         srcs = srcs,
-        deps = deps + ["//fw/base:newlib_stubs"],
-        additional_linker_inputs = [linker_script],
+        deps = deps + [board_label, "//fw/base:newlib_stubs"],
         features = ["generate_linkmap"],
-        linkopts = [
-            "-T$(execpath %s)" % linker_script,
-        ] + linkopts,
         target_compatible_with = target_compatible_with,
         **kwargs
     )
@@ -138,5 +133,5 @@ def cc_fw_app(
             ":" + name + ".bin",
             ":" + name + ".map",
         ],
-        platform = platform,
+        platform = board_label.same_package_label("platform"),
     )

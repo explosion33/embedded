@@ -2,7 +2,7 @@
 
 // FreeRTOS configuration shared by every STM32F4 part.
 //
-// Do not include this directly. Each part provides its own FreeRTOSConfig.h,
+// Do not include this directly. Each part provides its own *_freertos_config.h,
 // which defines anything it needs to differ and then includes this file. Every
 // setting here is guarded by #ifndef so those earlier definitions win.
 //
@@ -20,7 +20,7 @@
 // Settings each part must provide.
 
 #ifndef configTOTAL_HEAP_SIZE
-#error "configTOTAL_HEAP_SIZE must be set by the part's FreeRTOSConfig.h"
+#error "configTOTAL_HEAP_SIZE must be set by the part or board config"
 #endif
 
 // ---------------------------------------------------------------------------

@@ -21,8 +21,13 @@ TODO: Move this into a generic generate script, this script should run in CI and
 ## Firmware
 
 cc_libraries can be cross compiled into firmware binaries (.elf and .bin). Each
-`cc_fw_app` names the `platform` it is built for and cross compiles itself to
-that platform.
+`cc_fw_app` names the `board` it is built for and cross compiles itself to that
+board's platform.
+
+Code is split into three layers:
+- `fw/platform/<family>/common`: Peripheral drivers and RTOS port glue shared by a chip family.
+- `fw/platform/<family>/<part>`: Startup code, default linker script, and FreeRTOS defaults for one part.
+- `fw/boards/<board>`: The Bazel `platform`, pin assignments, FreeRTOS config, log backend, and linker script for one physical board.
 
 Compiled firmware can be flashed to a connected board via a debug probe (i.e. STLINK / NUCLEO) using the following tool:
 ```

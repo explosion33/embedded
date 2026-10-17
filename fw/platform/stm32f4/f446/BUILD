@@ -4,25 +4,9 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files(["stm32f446re.ld"])
 
-platform(
-    name = "platform",
-    constraint_values = [
-        "@platforms//cpu:armv7",
-        "@platforms//os:none",
-        "//fw/platform/constraints:cortex_m4f",
-        "//fw/platform/constraints:stm32f446",
-    ],
-    flags = [
-        "--@freertos_kernel//:config=//fw/platform/stm32f4/f446:freertos_config",
-        "--//fw/log:backend=//fw/platform/stm32f4/f446:log_backend",
-    ],
-)
-
-# Provides FreeRTOSConfig.h to the FreeRTOS kernel, via the flag set above.
 cc_library(
     name = "freertos_config",
-    hdrs = ["freertos/FreeRTOSConfig.h"],
-    strip_include_prefix = "freertos",
+    hdrs = ["freertos/stm32f446_freertos_config.h"],
     target_compatible_with = ["//fw/platform/constraints:stm32f446"],
     deps = ["//fw/platform/stm32f4/common:freertos_config_stm32f4"],
 )
@@ -34,22 +18,7 @@ cc_library(
     target_compatible_with = ["//fw/platform/constraints:stm32f446"],
     deps = [
         "//fw/platform/stm32f4/common:crt_stubs",
-        "//fw/platform/stm32f4/common:gpio",
         "//fw/platform/stm32f4/common:ll",
-        "//fw/platform/stm32f4/common:uart",
     ],
     alwayslink = True,
-)
-
-# The //fw/log backend: writes to the console UART and halts the Cortex-M.
-cc_library(
-    name = "log_backend",
-    srcs = ["log_write.cc"],
-    target_compatible_with = ["//fw/platform/constraints:stm32f446"],
-    deps = [
-        ":f446",
-        "//fw/log:headers",
-        "//fw/platform/stm32f4/common:halt",
-        "//fw/platform/stm32f4/common:uart",
-    ],
 )
