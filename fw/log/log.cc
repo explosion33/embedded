@@ -46,7 +46,7 @@ constexpr size_t kMaxMessageSize = 256;
   backend::Halt();
 }
 
-void LogInfoBlocking(const char* fmt, ...) {
+void LogBlocking(const char* fmt, ...) {
   va_list args;
   va_list args2;
   va_start(args, fmt);
@@ -56,12 +56,20 @@ void LogInfoBlocking(const char* fmt, ...) {
 
   char* buf = new char[size + 1];
   vsnprintf(buf, size + 1, fmt, args2);
-  backend::Write("INFO: ");
   backend::Write(std::string_view(buf, size));
-  backend::Write("\r\n");
   delete[] buf;
 
   va_end(args2);
+}
+
+void LogInfoBlocking(const char* fmt, ...) {
+  backend::Write("INFO: ");
+
+  va_list args;
+  va_start(args, fmt);
+  LogBlocking(fmt, args);
+  va_end(args);
+  backend::Write("\r\n");
 }
 
 }  // namespace fw::log::internal
