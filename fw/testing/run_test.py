@@ -1,3 +1,5 @@
+import contextlib
+import enum
 import pathlib
 import sys
 
@@ -12,6 +14,34 @@ TEST_PREFIX = "[FW_TEST]"
 TEST_SUFFIX = "[END_TEST]"
 TEST_PASS = "<PASS>"
 TEST_FAIL = "<FAIL>"
+
+
+class TerminalColor(enum.Enum):
+    RED = 0
+    GREEN = 1
+    GREY = 2
+
+
+@contextlib.contextmanager
+def terminal_color(color: TerminalColor):
+    """Applies ANSI color codes to the test within the context"""
+
+    def _get_code(color: TerminalColor) -> str:
+        if color == TerminalColor.RED:
+            return "31"
+        elif color == TerminalColor.GREEN:
+            return "32"
+        elif color == TerminalColor.GREY:
+            return "38;2;120;120;120"
+        raise ValueError("Unreachable")
+
+    sys.stdout.write(f"\033[{_get_code(color)}m")
+    sys.stdout.flush()
+    try:
+        yield
+    finally:
+        sys.stdout.write("\033[0m")
+        sys.stdout.flush()
 
 
 def _get_text(text: str, prefix: str, suffix: str | None = None) -> str | None:
@@ -57,7 +87,8 @@ def main(binary_rlocation: str, target: str, negative: bool):
         raise click.ClickException(f"Could not find '{binary_rlocation}' in runfiles.")
 
     with serial.Serial("/dev/ttyACM0", 115200, timeout=1) as ser:
-        flash.flash_from(pathlib.Path(binary_path), target)
+        with terminal_color(TerminalColor.GREY):
+            flash.flash_from(pathlib.Path(binary_path), target)
 
         text = ""
         while True:
@@ -65,11 +96,13 @@ def main(binary_rlocation: str, target: str, negative: bool):
 
             if msg := _get_text(text, TEST_PREFIX, TEST_SUFFIX):
                 if TEST_PASS in msg:
-                    print("Test Passed!")
+                    with terminal_color(TerminalColor.GREEN):
+                        print("Test Passed!")
                     sys.exit(pass_code)
                 elif fail_msg := _get_text(msg, TEST_FAIL):
-                    print("Test Failed!")
                     print(fail_msg)
+                    with terminal_color(TerminalColor.RED):
+                        print("Test Failed!")
                     sys.exit(fail_code)
                 else:
                     print(msg)
