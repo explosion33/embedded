@@ -1,6 +1,7 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_python//python:py_binary.bzl", "py_binary")
 load("//fw/platform/bazel:firmware.bzl", "cc_fw_app")
+load("//fw/testing/bazel:firmware.bzl", "cc_fw_test")
 
 package(default_visibility = ["//fw:__subpackages__"])
 
@@ -11,11 +12,11 @@ cc_library(
     deps = ["//fw/log"],
 )
 
-# TODO: Replace with a dedicated cc_fw_test once it exists.
-cc_fw_app(
+cc_fw_test(
     name = "pass_test",
     srcs = ["pass_test.cc"],
     board = "//fw/boards/nucleo_f446re",
+    target = "STM32F4",
     deps = [
         "//fw/os:main",
         "//fw/platform/stm32f4/common:freertos",
@@ -23,11 +24,11 @@ cc_fw_app(
     ],
 )
 
-# TODO: Replace with a dedicated cc_fw_test once it exists.
-cc_fw_app(
+cc_fw_test(
     name = "fail_test",
     srcs = ["fail_test.cc"],
     board = "//fw/boards/nucleo_f446re",
+    target = "STM32F4",
     deps = [
         "//fw/os:main",
         "//fw/platform/stm32f4/common:freertos",
@@ -42,6 +43,7 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         "//fw/tools:flash",
+        "@pypi//click",
         "@pypi//pyserial",
     ],
 )

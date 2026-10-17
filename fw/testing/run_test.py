@@ -1,12 +1,11 @@
 import pathlib
 import sys
 
+import click
 import serial
+from python.runfiles import runfiles  # pyright: ignore[reportMissingImports]
 
 from fw.tools import flash
-
-TEST_FILE = pathlib.Path("bazel-out/k8-fastbuild-ST-a8fd264bfc15/bin/fw/testing/fail_test.bin")
-BOARD = "STM32F4"
 
 # Must match values defined in fw/testing/test.cc
 TEST_PREFIX = "[FW_TEST]"
@@ -34,9 +33,25 @@ def _get_text(text: str, prefix: str, suffix: str | None = None) -> str | None:
     return text[start_idx:end]
 
 
-def main():
+@click.command
+@click.option(
+    "--binary_rlocation",
+    required=True,
+    type=str,
+)
+@click.option(
+    "--target",
+    required=True,
+    type=str,
+    help="The target of the device to autodetect and flash too.",
+)
+def main(binary_rlocation: str, target: str):
+    binary_path = runfiles.Create().Rlocation(binary_rlocation)
+    if binary_path is None:
+        raise click.ClickException(f"Could not find '{binary_rlocation}' in runfiles.")
+
     with serial.Serial("/dev/ttyACM0", 115200, timeout=1) as ser:
-        flash.flash_from(TEST_FILE, BOARD)
+        flash.flash_from(pathlib.Path(binary_path), target)
 
         text = ""
         while True:
