@@ -1,7 +1,9 @@
 #include <cstdio>
 
+#include "fw/log/check.h"
 #include "fw/os/main.h"
 #include "fw/os/mutex.h"
+#include "fw/os/semaphore.h"
 #include "fw/os/thread.h"
 #include "fw/os/time.h"
 #include "fw/testing/test.h"
@@ -202,6 +204,68 @@ bool MutexTimeout(TestSuite::Logger logger) {
   return true;
 }
 
+// Tests that semaphores work as expected.
+bool SemaphoreTest(TestSuite::Logger logger) {
+#define EXPECT_COUNT(expected)                                            \
+  if (count != expected) {                                                \
+    logger() << "Thread consumed " << count << " expected it to consume " \
+             << expected;                                                 \
+  }
+
+  for (size_t max_count : {1, 5, 20}) {
+    logger() << "Testing semaphore with max_count: " << max_count;
+    fw::os::Semaphore sem(max_count);
+    fw::os::Thread thread;
+
+    size_t count = 0;
+    bool run = true;
+    thread.Start([&count, &run, &sem]() {
+      while (run) {
+        sem.Take();
+        count++;
+      }
+    });
+
+    fw::os::Delay(10);
+    EXPECT_COUNT(0);
+
+    if (!sem.Give()) {
+      logger("Failed to give semaphore.");
+      return false;
+    }
+    fw::os::Delay(10);
+    EXPECT_COUNT(1);
+    count = 0;
+
+    for (size_t i = 0; i < max_count; i++) {
+      if (!sem.Give()) {
+        logger("Failed to give semaphore.");
+        return false;
+      }
+    }
+    fw::os::Delay(10);
+    EXPECT_COUNT(max_count);
+
+    run = false;
+    CHECK(sem.Give());
+    fw::os::Delay(10);
+
+    sem.Give();
+    if (!sem.TryTakeFor(10)) {
+      logger() << "Failed to take semaphore.";
+      return false;
+    }
+    if (sem.TryTakeFor(10)) {
+      logger() << "Took semaphore when none was available.";
+      return false;
+    }
+  }
+
+#undef EXPECT_COUNT
+
+  return true;
+}
+
 }  // namespace
 
 void fw::os::AppMain() {
@@ -212,4 +276,5 @@ void fw::os::AppMain() {
   suite.RunTest("ThreadPriority", &ThreadPriority);
   suite.RunTest("BlockingMutex", &BlockingMutex);
   suite.RunTest("MutexTimeout", &MutexTimeout);
+  suite.RunTest("SemaphoreTest", &SemaphoreTest);
 }
