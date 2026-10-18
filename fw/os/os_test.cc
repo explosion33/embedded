@@ -43,6 +43,24 @@ bool ThreadExecutesWithArguments(TestSuite::Logger logger) {
   return result;
 }
 
+// Tests that Thread::Join works properly.
+bool ThreadJoins(TestSuite::Logger logger) {
+  fw::os::Thread thread;
+
+  bool result = false;
+  thread.Start([&result]() {
+    fw::os::Delay(100);
+    result = true;
+  });
+
+  // Thread should join and we should be able to modify thread state again.
+  thread.Join();
+  thread.SetPriority(3);
+  thread.SetStackDepth(100);
+
+  return result;
+}
+
 // Spawns two threads and checks that the both complete in parallel.
 bool TwoThreadTest(TestSuite::Logger logger) {
   constexpr size_t kCount = 50;
@@ -277,6 +295,7 @@ void fw::os::AppMain() {
   TestSuite suite;
   suite.RunTest("TestDelayAndMillis", &TestDelayAndMillis);
   suite.RunTest("ThreadExecutesWithArguments", &ThreadExecutesWithArguments);
+  suite.RunTest("ThreadJoins", &ThreadJoins);
   suite.RunTest("TwoThreadTest", &TwoThreadTest);
   suite.RunTest("ThreadPriority", &ThreadPriority);
   suite.RunTest("BlockingMutex", &BlockingMutex);
