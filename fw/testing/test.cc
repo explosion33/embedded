@@ -1,5 +1,6 @@
 #include "fw/testing/test.h"
 
+#include <optional>
 #include <string_view>
 
 #include "fw/log/log.h"
@@ -7,43 +8,48 @@
 namespace fw::testing {
 namespace {
 
+// TODO: Replace arbitrary headers with protobuf and serdes.
 constexpr std::string_view kTestPrefix = "[FW_TEST]";
-constexpr std::string_view kTestSuffix = "[END_TEST]";
+constexpr std::string_view kTestMsg = "<MSG>";
 constexpr std::string_view kTestPass = "<PASS>";
 constexpr std::string_view kTestFail = "<FAIL>";
-
-enum class LogType {
-  kMessage,
-  kPass,
-  kFail,
-};
+constexpr std::string_view kTestStart = "<START>";
+constexpr std::string_view kTestSuiteEnd = "<END>";
 
 #define STRING_LOG(str) \
   LOG_BLOCKING("%.*s", static_cast<int>(str.length()), str.data());
 
-void LogImpl(std::string_view msg, LogType type) {
+// Sends a framed message over console to the harness.
+void MessageImpl(std::string_view code,
+                 std::optional<std::string_view> msg = std::nullopt) {
   STRING_LOG(kTestPrefix);
-  switch (type) {
-    case LogType::kMessage:
-      break;
-    case LogType::kPass:
-      STRING_LOG(kTestPass);
-      break;
-    case LogType::kFail:
-      STRING_LOG(kTestFail);
-      break;
+  STRING_LOG(code);
+  if (msg.has_value()) {
+    STRING_LOG(msg.value());
   }
-  STRING_LOG(msg);
-  STRING_LOG(kTestSuffix);
   LOG_BLOCKING("\r\n");
 }
 
 }  // namespace
 
-void LogTest(std::string_view msg) { LogImpl(msg, LogType::kMessage); }
+TestSuite::~TestSuite() {
+  if (!ran_) {
+    MessageImpl(kTestFail, "No tests ran in suite.");
+    return;
+  }
+  MessageImpl(kTestSuiteEnd);
+}
 
-void TestPass() { LogImpl("", LogType::kPass); }
+void TestSuite::Log(std::string_view msg) { MessageImpl(kTestMsg, msg); }
 
-void TestFail(std::string_view msg) { LogImpl(msg, LogType::kFail); }
+bool TestSuite::RunTest(std::string_view name,
+                        std::function<bool(LogFunction)> test) {
+  MessageImpl(kTestStart, name);
+  const bool result = test(&TestSuite::Log);
+  ran_ = true;
+  MessageImpl(result ? kTestPass : kTestFail);
+
+  return result;
+}
 
 }  // namespace fw::testing
