@@ -1,9 +1,9 @@
 #pragma once
 
-#include <concepts>
 #include <cstddef>
 #include <string_view>
-#include <type_traits>
+
+#include "fw/log/stream.h"
 
 // Fatal Errors when `cond` is false. Supports streaming error messages with
 // `<<`.
@@ -16,7 +16,7 @@ namespace fw::check::internal {
 
 // Accumulates the message for a failed CHECK. The destructor reports it through
 // LOG_FATAL and halts.
-class FatalStream {
+class FatalStream : public ::fw::log::Stream<FatalStream> {
  public:
   // Writes "Check failed: cond " into the static buffer.
   FatalStream(const char* file, int line, const char* condition);
@@ -26,36 +26,13 @@ class FatalStream {
   FatalStream(const FatalStream&) = delete;
   FatalStream& operator=(const FatalStream&) = delete;
 
-  FatalStream& operator<<(const char* s);
-  FatalStream& operator<<(std::string_view s);
-  FatalStream& operator<<(bool b);
-  FatalStream& operator<<(char c);
-  FatalStream& operator<<(const void* p);
-
-  template <std::integral T>
-  FatalStream& operator<<(T v) {
-    if constexpr (std::is_signed_v<T>) {
-      AppendSigned(v);
-    } else {
-      AppendUnsigned(v);
-    }
-    return *this;
-  }
-
  private:
+  friend class ::fw::log::Stream<FatalStream>;
+
   static constexpr size_t kMaxMessageSize = 256;
 
   // Appends `text` to the message.
   static void Append(std::string_view text);
-
-  // Appends a number to the message with the provided base.
-  static void AppendNumber(unsigned long long value, unsigned base);
-
-  // Appends a signed number to the message.
-  static void AppendSigned(long long value);
-
-  // Appends an usigned number to the message.
-  static void AppendUnsigned(unsigned long long value);
 
   // The message this FatalStream encodes, static since the stack may have
   // failed.
