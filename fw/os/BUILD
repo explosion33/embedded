@@ -27,6 +27,18 @@ cc_library(
 )
 
 cc_library(
+    name = "mutex",
+    srcs = ["mutex.cc"],
+    hdrs = ["mutex.h"],
+    target_compatible_with = ["@platforms//os:none"],
+    deps = [
+        ":main",  # Link main so os apps can't redifine main.
+        "//fw/log:check",
+        "@freertos_kernel//:freertos",
+    ],
+)
+
+cc_library(
     name = "task_wrapper",
     srcs = ["task_wrapper.cc"],
     hdrs = ["task_wrapper.h"],
@@ -54,6 +66,7 @@ cc_fw_test(
     board = "//fw/boards/nucleo_f446re",
     target = "STM32F4",
     deps = [
+        "//fw/os:mutex",
         "//fw/os:thread",
         "//fw/os:time",
         "//fw/platform/stm32f4/common:freertos",
