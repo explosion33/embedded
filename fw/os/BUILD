@@ -1,4 +1,5 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//fw/testing/bazel:firmware.bzl", "cc_fw_test")
 
 package(default_visibility = ["//fw:__subpackages__"])
 
@@ -45,4 +46,17 @@ cc_library(
     ],
     target_compatible_with = ["@platforms//os:none"],
     alwayslink = True,
+)
+
+cc_fw_test(
+    name = "os_test",
+    srcs = ["os_test.cc"],
+    board = "//fw/boards/nucleo_f446re",
+    target = "STM32F4",
+    deps = [
+        "//fw/os:thread",
+        "//fw/os:time",
+        "//fw/platform/stm32f4/common:freertos",
+        "//fw/testing:test",
+    ],
 )
