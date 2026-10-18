@@ -10,13 +10,13 @@ using fw::testing::TestSuite;
 
 void fw::os::AppMain() {
   TestSuite suite;
-  suite.RunTest("fail_test", [](TestSuite::LogFunction log) {
-    log("This test should fail");
+  suite.RunTest("fail_test", [](TestSuite::Logger logger) {
+    logger("This test should fail");
     return false;
   });
 
-  suite.RunTest("fail_test_2", [](TestSuite::LogFunction log) {
-    log("This test should also fail");
+  suite.RunTest("fail_test_2", [](TestSuite::Logger logger) {
+    logger("This test should also fail");
     return false;
   });
 }
