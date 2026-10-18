@@ -210,6 +210,7 @@ bool SemaphoreTest(TestSuite::Logger logger) {
   if (count != expected) {                                                \
     logger() << "Thread consumed " << count << " expected it to consume " \
              << expected;                                                 \
+    return false;                                                         \
   }
 
   for (size_t max_count : {1, 5, 20}) {
