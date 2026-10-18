@@ -17,4 +17,6 @@ void Delay(size_t millis) {
   vTaskDelay(ticks);
 }
 
+size_t Millis() { return pdTICKS_TO_MS(xTaskGetTickCount()); }
+
 }  // namespace fw::os
