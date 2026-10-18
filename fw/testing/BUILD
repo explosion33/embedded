@@ -8,7 +8,10 @@ cc_library(
     name = "test",
     srcs = ["test.cc"],
     hdrs = ["test.h"],
-    deps = ["//fw/log"],
+    deps = [
+        "//fw/log",
+        "//fw/log:invocable_stream",
+    ],
 )
 
 cc_fw_test(

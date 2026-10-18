@@ -43,9 +43,9 @@ TestSuite::~TestSuite() {
 void TestSuite::Log(std::string_view msg) { MessageImpl(kTestMsg, msg); }
 
 bool TestSuite::RunTest(std::string_view name,
-                        std::function<bool(LogFunction)> test) {
+                        std::function<bool(Logger)> test) {
   MessageImpl(kTestStart, name);
-  const bool result = test(&TestSuite::Log);
+  const bool result = test(Logger{});
   ran_ = true;
   MessageImpl(result ? kTestPass : kTestFail);
 

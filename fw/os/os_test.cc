@@ -9,10 +9,11 @@ namespace {
 using fw::testing::TestSuite;
 
 // Tests that Delay results and an equivelent change in millis.
-bool TestDelayAndMillis(TestSuite::LogFunction log) {
-  constexpr size_t kMaxError = 5;
+bool TestDelayAndMillis(TestSuite::Logger logger) {
+  constexpr size_t kMaxError = 1;
 
   for (size_t millis : {10, 100, 500, 1000}) {
+    logger() << "Delaying " << millis << "ms.";
     const size_t start = fw::os::Millis();
     fw::os::Delay(millis);
 
@@ -20,7 +21,8 @@ bool TestDelayAndMillis(TestSuite::LogFunction log) {
     const int diff = millis - elapsed;
     const size_t abs_diff = diff > 0 ? diff : diff * -1;
     if (abs_diff > kMaxError) {
-      // TODO: Add error message once log() supports format strings.
+      logger() << "Delay of " << millis << "ms actually slept for " << elapsed
+               << "ms.";
       return false;
     }
   }
@@ -29,7 +31,7 @@ bool TestDelayAndMillis(TestSuite::LogFunction log) {
 
 // Starts a simple thread that accepts arguments and modifies values. Testing
 // that the variadic arguments reach the function.
-bool ThreadExecutesWithArguments(TestSuite::LogFunction log) {
+bool ThreadExecutesWithArguments(TestSuite::Logger logger) {
   fw::os::Thread thread;
 
   bool result = false;
@@ -39,7 +41,7 @@ bool ThreadExecutesWithArguments(TestSuite::LogFunction log) {
 }
 
 // Spawns two threads and checks that the both complete in parallel.
-bool TwoThreadTest(TestSuite::LogFunction log) {
+bool TwoThreadTest(TestSuite::Logger logger) {
   constexpr size_t kCount = 50;
   size_t count1 = 0;
   size_t count2 = 0;
@@ -70,7 +72,8 @@ bool TwoThreadTest(TestSuite::LogFunction log) {
   fw::os::Delay(100);
 
   if (!count2_intermediate) {
-    log("Thread1 did not observe incremental changes in thread2. Threads ran "
+    logger(
+        "Thread1 did not observe incremental changes in thread2. Threads ran "
         "in sequence.");
     return false;
   }
@@ -80,7 +83,7 @@ bool TwoThreadTest(TestSuite::LogFunction log) {
 
 // Spawns two threads and ensures the higher priority one does not yield to the
 // lower priority one.
-bool ThreadPriority(TestSuite::LogFunction log) {
+bool ThreadPriority(TestSuite::Logger logger) {
   constexpr size_t kRunTime = 100;
   fw::os::Thread thread;
   fw::os::Thread thread2;
