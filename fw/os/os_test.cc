@@ -243,6 +243,10 @@ bool SemaphoreTest(TestSuite::Logger logger) {
         return false;
       }
     }
+    if (sem.Count() != max_count) {
+      logger() << "Expected count of " << max_count << " Got " << sem.Count();
+      return false;
+    }
     fw::os::Delay(10);
     EXPECT_COUNT(max_count);
 

@@ -15,6 +15,9 @@ class Semaphore {
   // Takes from the semaphore, blocking until.
   void Take();
 
+  // Gets the current semaphore count;
+  size_t Count();
+
   // Tries to take a single count for the specified timeout. Returns true if
   // succeeded.
   bool TryTakeFor(size_t millis);

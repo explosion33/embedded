@@ -34,4 +34,9 @@ bool Semaphore::TryTakeFor(size_t millis) {
   return xSemaphoreTake(handle, pdMS_TO_TICKS(millis)) == pdTRUE;
 }
 
+size_t Semaphore::Count() {
+  SemaphoreHandle_t handle = static_cast<SemaphoreHandle_t>(handle_);
+  return uxSemaphoreGetCount(handle);
+}
+
 }  // namespace fw::os
