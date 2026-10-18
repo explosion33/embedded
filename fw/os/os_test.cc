@@ -6,7 +6,7 @@
 #include "fw/os/semaphore.h"
 #include "fw/os/thread.h"
 #include "fw/os/time.h"
-#include "fw/testing/test.h"
+#include "fw/testing/test_suite.h"
 
 namespace {
 using fw::testing::TestSuite;

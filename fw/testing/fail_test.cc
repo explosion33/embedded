@@ -2,7 +2,7 @@
 
 #include "fw/boards/nucleo_f446re/board.h"
 #include "fw/os/main.h"
-#include "fw/testing/test.h"
+#include "fw/testing/test_suite.h"
 
 namespace {
 using fw::testing::TestSuite;
