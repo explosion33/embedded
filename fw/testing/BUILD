@@ -14,6 +14,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "test",
+    srcs = ["test.cc"],
+    hdrs = ["test.h"],
+    deps = [
+        ":test_suite",
+        "//fw/os:main",
+    ],
+)
+
 cc_fw_test(
     name = "pass_test",
     srcs = ["pass_test.cc"],
@@ -22,7 +32,7 @@ cc_fw_test(
     deps = [
         "//fw/os:main",
         "//fw/platform/stm32f4/common:freertos",
-        "//fw/testing:test_suite",
+        "//fw/testing:test",
     ],
 )
 
