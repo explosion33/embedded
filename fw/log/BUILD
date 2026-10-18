@@ -29,6 +29,15 @@ cc_library(
 )
 
 cc_library(
+    name = "invocable_stream",
+    srcs = ["invocable_stream.cc"],
+    hdrs = ["invocable_stream.h"],
+    deps = [
+        ":stream",
+    ],
+)
+
+cc_library(
     name = "headers",
     hdrs = [
         "backend.h",
