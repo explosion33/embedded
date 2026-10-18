@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include "fw/os/main.h"
+#include "fw/os/mutex.h"
 #include "fw/os/thread.h"
 #include "fw/os/time.h"
 #include "fw/testing/test.h"
@@ -117,6 +118,90 @@ bool ThreadPriority(TestSuite::Logger logger) {
   return result && t2_start;
 }
 
+// Tests a blocking mutex (no timeout) between two threads ensuring each waits
+// for mutex acquistition.
+bool BlockingMutex(TestSuite::Logger logger) {
+  fw::os::Mutex mutex;
+
+  bool run = true;
+  size_t count = 0;
+  fw::os::Thread thread;
+  thread.Start([&mutex, &count, &run]() {
+    while (run) {
+      mutex.Lock();
+      count++;
+      mutex.Unlock();
+      fw::os::Delay(1);
+    }
+  });
+
+  // The thread should be able to lock / unlock the mutex and increment the
+  // count.
+  fw::os::Delay(20);
+  if (count == 0) {
+    logger("Initial thread state did not tick.");
+    return false;
+  }
+
+  // Locking the mutex should stop the count from incrementing.
+  mutex.Lock();
+  count = 0;
+  fw::os::Delay(20);
+  if (count != 0) {
+    logger("Thread was not gated on the mutex.");
+    return false;
+  }
+
+  // Unlocking should re-allow the thread to progress.
+  mutex.Unlock();
+  fw::os::Delay(20);
+  if (count == 0) {
+    logger("Unlocking the mutex did not resume thread.");
+    return false;
+  }
+
+  // TODO: Replace with Join().
+  run = false;
+  fw::os::Delay(20);
+
+  return true;
+}
+
+// Tests the mutex's timeout lock call.
+bool MutexTimeout(TestSuite::Logger logger) {
+  constexpr size_t kTimeout = 10;
+  constexpr size_t kError = 1;
+  fw::os::Mutex mutex;
+
+  // Locking the mutex should cause TryLockFor to timeout.
+  mutex.Lock();
+  size_t start = fw::os::Millis();
+  if (mutex.TryLockFor(kTimeout)) {
+    logger("TryLockFor locked the mutex while already locked.");
+    return false;
+  }
+
+  // We expect the elapsed time to be ~10ms.
+  const size_t elapsed = fw::os::Millis() - start;
+  const size_t diff =
+      elapsed > kTimeout ? elapsed - kTimeout : kTimeout - elapsed;
+
+  if (diff > kError) {
+    logger() << "Expected TryLockFor to timeout after " << kTimeout
+             << "ms, it took " << elapsed << "ms";
+    return false;
+  }
+
+  // Unlocking the mutex should acquire the lock.
+  mutex.Unlock();
+  if (!mutex.TryLockFor(kTimeout)) {
+    logger("Mutex was not locked.");
+    return false;
+  }
+
+  return true;
+}
+
 }  // namespace
 
 void fw::os::AppMain() {
@@ -125,4 +210,6 @@ void fw::os::AppMain() {
   suite.RunTest("ThreadExecutesWithArguments", &ThreadExecutesWithArguments);
   suite.RunTest("TwoThreadTest", &TwoThreadTest);
   suite.RunTest("ThreadPriority", &ThreadPriority);
+  suite.RunTest("BlockingMutex", &BlockingMutex);
+  suite.RunTest("MutexTimeout", &MutexTimeout);
 }
