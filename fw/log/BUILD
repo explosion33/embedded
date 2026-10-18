@@ -18,7 +18,14 @@ cc_library(
     deps = [
         ":headers",
         ":log",
+        ":stream",
     ],
+)
+
+cc_library(
+    name = "stream",
+    srcs = ["stream.cc"],
+    hdrs = ["stream.h"],
 )
 
 cc_library(
