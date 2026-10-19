@@ -45,7 +45,7 @@ cc_fw_test(
     deps = [
         "//fw/os:main",
         "//fw/platform/stm32f4/common:freertos",
-        "//fw/testing:test_suite",
+        "//fw/testing:test",
     ],
 )
 
