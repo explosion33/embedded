@@ -20,6 +20,7 @@ cc_library(
     hdrs = ["test.h"],
     deps = [
         ":test_suite",
+        "//fw/log:failure_stream",
         "//fw/os:main",
     ],
 )
@@ -45,7 +46,7 @@ cc_fw_test(
     deps = [
         "//fw/os:main",
         "//fw/platform/stm32f4/common:freertos",
-        "//fw/testing:test_suite",
+        "//fw/testing:test",
     ],
 )
 

@@ -38,6 +38,14 @@ cc_library(
 )
 
 cc_library(
+    name = "failure_stream",
+    hdrs = ["failure_stream.h"],
+    deps = [
+        ":stream",
+    ],
+)
+
+cc_library(
     name = "headers",
     hdrs = [
         "backend.h",
