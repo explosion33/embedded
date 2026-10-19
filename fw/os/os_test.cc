@@ -8,7 +8,6 @@
 #include "fw/testing/test.h"
 
 namespace {
-using fw::testing::TestSuite;
 
 TEST(TestDelayAndMillis) {
   constexpr size_t kMaxError = 1;
