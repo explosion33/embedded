@@ -5,4 +5,6 @@ void _init() {}
 
 void _fini() {}
 
+void* __dso_handle = nullptr;
+
 }  // extern "C"

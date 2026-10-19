@@ -1,24 +1,22 @@
 #include <cstdio>
+#include <string_view>
 
 #include "fw/boards/nucleo_f446re/board.h"
-#include "fw/os/main.h"
-#include "fw/testing/test_suite.h"
+#include "fw/log/stream.h"
+#include "fw/testing/test.h"
 
 namespace {
-using fw::testing::TestSuite;
+
+TEST(test) {
+  LOG() << "This test should pass";
+  return true;
 }
 
-void fw::os::AppMain() {
-  TestSuite suite;
-  suite.RunTest("test", [](TestSuite::Logger logger) {
-    logger("This test should pass");
-    return true;
-  });
-
-  suite.RunTest("pass_test_test_2", [](TestSuite::Logger logger) {
-    logger("log 1");
-    logger("log 2");
-    logger() << "streamed " << "log " << 3;
-    return true;
-  });
+TEST(pass_test_test_2) {
+  LOG() << "log 1";
+  LOG() << "log 2";
+  LOG() << "streamed " << "log " << 3;
+  return true;
 }
+
+}  // namespace
