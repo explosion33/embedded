@@ -54,5 +54,9 @@ struct ReturnFailure {
 #define ASSERT_FALSE(cond) ASSERT_TRUE(!cond)
 #define ASSERT_EQ(first, second) ASSERT_TRUE(first == second)
 #define ASSERT_NE(first, second) ASSERT_TRUE(first != second)
+#define ASSERT_LT(first, second) ASSERT_TRUE(first < second)
+#define ASSERT_LE(first, second) ASSERT_TRUE(first <= second)
+#define ASSERT_GT(first, second) ASSERT_TRUE(first > second)
+#define ASSERT_GE(first, second) ASSERT_TRUE(first >= second)
 
 }  // namespace fw::testing
