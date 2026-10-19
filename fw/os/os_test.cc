@@ -1,50 +1,42 @@
 #include <cstdio>
 
 #include "fw/log/check.h"
-#include "fw/os/main.h"
 #include "fw/os/mutex.h"
 #include "fw/os/semaphore.h"
 #include "fw/os/thread.h"
 #include "fw/os/time.h"
-#include "fw/testing/test_suite.h"
+#include "fw/testing/test.h"
 
 namespace {
 using fw::testing::TestSuite;
 
-// Tests that Delay results and an equivelent change in millis.
-bool TestDelayAndMillis(TestSuite::Logger logger) {
+TEST(TestDelayAndMillis) {
   constexpr size_t kMaxError = 1;
 
   for (size_t millis : {10, 100, 500, 1000}) {
-    logger() << "Delaying " << millis << "ms.";
+    LOG() << "Delaying " << millis << "ms.";
     const size_t start = fw::os::Millis();
     fw::os::Delay(millis);
 
     const size_t elapsed = fw::os::Millis() - start;
-    const int diff = millis - elapsed;
-    const size_t abs_diff = diff > 0 ? diff : diff * -1;
-    if (abs_diff > kMaxError) {
-      logger() << "Delay of " << millis << "ms actually slept for " << elapsed
-               << "ms.";
-      return false;
-    }
+    const size_t diff = millis > elapsed ? millis - elapsed : elapsed - millis;
+    ASSERT_LE(diff, kMaxError) << millis;
   }
   return true;
 }
 
-// Starts a simple thread that accepts arguments and modifies values. Testing
-// that the variadic arguments reach the function.
-bool ThreadExecutesWithArguments(TestSuite::Logger logger) {
+TEST(ThreadExecutesWithArguments) {
   fw::os::Thread thread;
 
   bool result = false;
   thread.Start([](bool* result, bool val) { *result = val; }, &result, true);
   thread.Join();
-  return result;
+  ASSERT_TRUE(result);
+
+  return true;
 }
 
-// Tests that Thread::Join works properly.
-bool ThreadJoins(TestSuite::Logger logger) {
+TEST(ThreadJoins) {
   fw::os::Thread thread;
 
   bool result = false;
@@ -58,11 +50,12 @@ bool ThreadJoins(TestSuite::Logger logger) {
   thread.SetPriority(3);
   thread.SetStackDepth(100);
 
-  return result;
+  ASSERT_TRUE(result);
+
+  return true;
 }
 
-// Spawns two threads and checks that the both complete in parallel.
-bool TwoThreadTest(TestSuite::Logger logger) {
+TEST(TwoThreadTest) {
   constexpr size_t kCount = 50;
   size_t count1 = 0;
   size_t count2 = 0;
@@ -92,19 +85,14 @@ bool TwoThreadTest(TestSuite::Logger logger) {
   t1.Join();
   t2.Join();
 
-  if (!count2_intermediate) {
-    logger(
-        "Thread1 did not observe incremental changes in thread2. Threads ran "
-        "in sequence.");
-    return false;
-  }
+  ASSERT_TRUE(count2_intermediate);
+  ASSERT_EQ(count1, kCount);
+  ASSERT_EQ(count2, kCount);
 
-  return count1 == kCount && count2 == kCount;
+  return true;
 }
 
-// Spawns two threads and ensures the higher priority one does not yield to the
-// lower priority one.
-bool ThreadPriority(TestSuite::Logger logger) {
+TEST(ThreadPriority) {
   constexpr size_t kRunTime = 100;
   fw::os::Thread thread;
   fw::os::Thread thread2;
@@ -135,12 +123,13 @@ bool ThreadPriority(TestSuite::Logger logger) {
 
   // We expect thread1 to have not seen thread2 start, but thread2 to still
   // finish after thread1 has.
-  return result && t2_start;
+  ASSERT_TRUE(result);
+  ASSERT_TRUE(t2_start);
+
+  return true;
 }
 
-// Tests a blocking mutex (no timeout) between two threads ensuring each waits
-// for mutex acquistition.
-bool BlockingMutex(TestSuite::Logger logger) {
+TEST(BlockingMutex) {
   fw::os::Mutex mutex;
 
   bool run = true;
@@ -158,27 +147,18 @@ bool BlockingMutex(TestSuite::Logger logger) {
   // The thread should be able to lock / unlock the mutex and increment the
   // count.
   fw::os::Delay(20);
-  if (count == 0) {
-    logger("Initial thread state did not tick.");
-    return false;
-  }
+  ASSERT_NE(count, 0);
 
   // Locking the mutex should stop the count from incrementing.
   mutex.Lock();
   count = 0;
   fw::os::Delay(20);
-  if (count != 0) {
-    logger("Thread was not gated on the mutex.");
-    return false;
-  }
+  ASSERT_EQ(count, 0);
 
   // Unlocking should re-allow the thread to progress.
   mutex.Unlock();
   fw::os::Delay(20);
-  if (count == 0) {
-    logger("Unlocking the mutex did not resume thread.");
-    return false;
-  }
+  ASSERT_NE(count, 0);
 
   run = false;
   thread.Join();
@@ -186,8 +166,7 @@ bool BlockingMutex(TestSuite::Logger logger) {
   return true;
 }
 
-// Tests the mutex's timeout lock call.
-bool MutexTimeout(TestSuite::Logger logger) {
+TEST(MutexTimeout) {
   constexpr size_t kTimeout = 10;
   constexpr size_t kError = 1;
   fw::os::Mutex mutex;
@@ -195,43 +174,24 @@ bool MutexTimeout(TestSuite::Logger logger) {
   // Locking the mutex should cause TryLockFor to timeout.
   mutex.Lock();
   size_t start = fw::os::Millis();
-  if (mutex.TryLockFor(kTimeout)) {
-    logger("TryLockFor locked the mutex while already locked.");
-    return false;
-  }
+  ASSERT_FALSE(mutex.TryLockFor(kTimeout));
 
   // We expect the elapsed time to be ~10ms.
   const size_t elapsed = fw::os::Millis() - start;
   const size_t diff =
       elapsed > kTimeout ? elapsed - kTimeout : kTimeout - elapsed;
-
-  if (diff > kError) {
-    logger() << "Expected TryLockFor to timeout after " << kTimeout
-             << "ms, it took " << elapsed << "ms";
-    return false;
-  }
+  ASSERT_LE(diff, kError) << elapsed;
 
   // Unlocking the mutex should acquire the lock.
   mutex.Unlock();
-  if (!mutex.TryLockFor(kTimeout)) {
-    logger("Mutex was not locked.");
-    return false;
-  }
+  ASSERT_TRUE(mutex.TryLockFor(kTimeout));
 
   return true;
 }
 
-// Tests that semaphores work as expected.
-bool SemaphoreTest(TestSuite::Logger logger) {
-#define EXPECT_COUNT(expected)                                            \
-  if (count != expected) {                                                \
-    logger() << "Thread consumed " << count << " expected it to consume " \
-             << expected;                                                 \
-    return false;                                                         \
-  }
-
+TEST(SemaphoreTest) {
   for (size_t max_count : {1, 5, 20}) {
-    logger() << "Testing semaphore with max_count: " << max_count;
+    LOG() << "Testing semaphore with max_count: " << max_count;
     fw::os::Semaphore sem(max_count);
     fw::os::Thread thread;
 
@@ -245,59 +205,30 @@ bool SemaphoreTest(TestSuite::Logger logger) {
     });
 
     fw::os::Delay(10);
-    EXPECT_COUNT(0);
+    ASSERT_EQ(count, 0);
 
-    if (!sem.Give()) {
-      logger("Failed to give semaphore.");
-      return false;
-    }
+    ASSERT_TRUE(sem.Give());
     fw::os::Delay(10);
-    EXPECT_COUNT(1);
+    ASSERT_EQ(count, 1);
     count = 0;
 
     for (size_t i = 0; i < max_count; i++) {
-      if (!sem.Give()) {
-        logger("Failed to give semaphore.");
-        return false;
-      }
+      ASSERT_TRUE(sem.Give());
     }
-    if (sem.Count() != max_count) {
-      logger() << "Expected count of " << max_count << " Got " << sem.Count();
-      return false;
-    }
+    ASSERT_EQ(sem.Count(), max_count);
     fw::os::Delay(10);
-    EXPECT_COUNT(max_count);
+    ASSERT_EQ(count, max_count);
 
     run = false;
     CHECK(sem.Give());
     thread.Join();
 
     sem.Give();
-    if (!sem.TryTakeFor(10)) {
-      logger() << "Failed to take semaphore.";
-      return false;
-    }
-    if (sem.TryTakeFor(10)) {
-      logger() << "Took semaphore when none was available.";
-      return false;
-    }
+    ASSERT_TRUE(sem.TryTakeFor(10));
+    ASSERT_FALSE(sem.TryTakeFor(10));
   }
-
-#undef EXPECT_COUNT
 
   return true;
 }
 
 }  // namespace
-
-void fw::os::AppMain() {
-  TestSuite suite;
-  suite.RunTest("TestDelayAndMillis", &TestDelayAndMillis);
-  suite.RunTest("ThreadExecutesWithArguments", &ThreadExecutesWithArguments);
-  suite.RunTest("ThreadJoins", &ThreadJoins);
-  suite.RunTest("TwoThreadTest", &TwoThreadTest);
-  suite.RunTest("ThreadPriority", &ThreadPriority);
-  suite.RunTest("BlockingMutex", &BlockingMutex);
-  suite.RunTest("MutexTimeout", &MutexTimeout);
-  suite.RunTest("SemaphoreTest", &SemaphoreTest);
-}
