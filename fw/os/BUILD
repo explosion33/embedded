@@ -84,6 +84,6 @@ cc_fw_test(
         ":thread",
         ":time",
         "//fw/platform/stm32f4/common:freertos",
-        "//fw/testing:test_suite",
+        "//fw/testing:test",
     ],
 )
