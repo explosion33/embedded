@@ -11,7 +11,7 @@ namespace fw::log {
 class FailureStream : public ::fw::log::Stream<FailureStream> {
  public:
   FailureStream(const char* file, int line, std::string_view cond) {
-    *this << file << ":" << line << ": Expected: " << cond << " | ";
+    *this << file << ":" << line << ": Expected: " << cond << " ";
   }
 
   // Gets the captured text of the stream.

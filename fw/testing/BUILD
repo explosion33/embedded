@@ -20,6 +20,7 @@ cc_library(
     hdrs = ["test.h"],
     deps = [
         ":test_suite",
+        "//fw/log:failure_stream",
         "//fw/os:main",
     ],
 )

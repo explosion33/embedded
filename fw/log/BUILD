@@ -39,7 +39,6 @@ cc_library(
 
 cc_library(
     name = "failure_stream",
-    srcs = ["failure_stream.cc"],
     hdrs = ["failure_stream.h"],
     deps = [
         ":stream",

@@ -7,5 +7,7 @@ namespace {
 using fw::testing::TestSuite;
 }
 
-TEST(fail_test) { ASSERT_TRUE(false) << "This test should fail."; }
-TEST(fail_test_2) { ASSERT_TRUE(false) << "This test should also fail."; }
+TEST(fail_true) { ASSERT_TRUE(false) << "This test should fail."; }
+TEST(fail_false) { ASSERT_FALSE(true) << "This test should also fail."; }
+TEST(fail_eq) { ASSERT_EQ(1, 3); }
+TEST(fail_ne) { ASSERT_NE(1, 1); }

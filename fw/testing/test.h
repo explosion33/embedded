@@ -51,4 +51,8 @@ struct ReturnFailure {
       return fw::testing::internal::ReturnFailure() = \
                  fw::log::FailureStream(__FILE__, __LINE__, #cond)
 
+#define ASSERT_FALSE(cond) ASSERT_TRUE(!cond)
+#define ASSERT_EQ(first, second) ASSERT_TRUE(first == second)
+#define ASSERT_NE(first, second) ASSERT_TRUE(first != second)
+
 }  // namespace fw::testing
