@@ -61,4 +61,22 @@ struct ReturnFailure {
 #define ASSERT_GT(first, second) ASSERT_TRUE(first > second)
 #define ASSERT_GE(first, second) ASSERT_TRUE(first >= second)
 
+#define EXPECT_TRUE(cond) \
+  switch (0)              \
+  case 0:                 \
+  default:                \
+    if (cond) {           \
+    } else                \
+      _handle.FailTest(), \
+          _handle.Log()   \
+              << fw::log::FailureStream(__FILE__, __LINE__, #cond).Text()
+
+#define EXPECT_FALSE(cond) EXPECT_TRUE(!cond)
+#define EXPECT_EQ(first, second) EXPECT_TRUE(first == second)
+#define EXPECT_NE(first, second) EXPECT_TRUE(first != second)
+#define EXPECT_LT(first, second) EXPECT_TRUE(first < second)
+#define EXPECT_LE(first, second) EXPECT_TRUE(first <= second)
+#define EXPECT_GT(first, second) EXPECT_TRUE(first > second)
+#define EXPECT_GE(first, second) EXPECT_TRUE(first >= second)
+
 }  // namespace fw::testing
