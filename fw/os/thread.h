@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <optional>
 #include <tuple>
 #include <utility>
 
@@ -11,7 +12,6 @@
 namespace fw::os {
 
 // Implements a C++ style thread wrapping FreeRTOS tasks.
-// TODO: Add more features: join, cancel, status, etc.
 class Thread {
  public:
   Thread() : thread_state_sem_(1) { CHECK(thread_state_sem_.Give()); };
@@ -37,8 +37,32 @@ class Thread {
     thread_state_sem_.Give();
   }
 
+  // Pauses the thread. Thread must be running.
+  void Pause() {
+    TryClearTask();
+    CHECK(task_.has_value());
+    task_->Pause();
+  }
+
+  // Resumes a paused thread. Thread must be started and paused.
+  void Resume() {
+    TryClearTask();
+    CHECK(task_.has_value());
+    task_->Resume();
+  }
+
+  // Stops a thread, once stopped it cannot be restarted. Stopping a thread does
+  // not clean up heap allocated memory.
+  void Stop() {
+    TryClearTask();
+    if (task_.has_value()) {
+      task_->Stop();
+      task_.reset();
+      thread_state_sem_.Give();
+    }
+  }
+
   // Runs the provided function in the thread with the provided arguments.
-  // Can only be called once.
   template <typename Fn, typename... Args>
   void Start(Fn fn, Args... args) {
     CHECK(thread_state_sem_.Count() == 1);
@@ -58,10 +82,10 @@ class Thread {
 
       std::apply(local.fn, std::move(local.args));
       local.sem.Give();
-      internal::ExitCurrentTask();
+      internal::Task::ExitCurrentTask();
     };
 
-    internal::CreateTask(internal::TaskConfig{
+    task_.emplace(internal::Task::Config{
         .fn = entry,
         .arg = payload,
         .name = "",
@@ -80,8 +104,15 @@ class Thread {
     fw::os::Semaphore& sem;
   };
 
+  // Checks if the task has finished and clears the local handle.
+  void TryClearTask() {
+    if (thread_state_sem_.Count() == 1) {
+      task_.reset();
+    }
+  }
+
   // The stack depth of the next spawned task.
-  size_t stack_depth_ = internal::GetMinimalStackSize();
+  size_t stack_depth_ = internal::Task::GetMinimalStackSize();
 
   // The priority of the next spawned task.
   size_t priority_ = 0;
@@ -89,6 +120,9 @@ class Thread {
   // Semaphore to track the state of the thread. 0 if running / scheduled, 1 if
   // not.
   fw::os::Semaphore thread_state_sem_;
+
+  // The currently executing task.
+  std::optional<internal::Task> task_;
 };
 
 }  // namespace fw::os
