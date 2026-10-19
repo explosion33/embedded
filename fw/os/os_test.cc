@@ -39,7 +39,25 @@ bool ThreadExecutesWithArguments(TestSuite::Logger logger) {
 
   bool result = false;
   thread.Start([](bool* result, bool val) { *result = val; }, &result, true);
-  fw::os::Delay(100);
+  thread.Join();
+  return result;
+}
+
+// Tests that Thread::Join works properly.
+bool ThreadJoins(TestSuite::Logger logger) {
+  fw::os::Thread thread;
+
+  bool result = false;
+  thread.Start([&result]() {
+    fw::os::Delay(100);
+    result = true;
+  });
+
+  // Thread should join and we should be able to modify thread state again.
+  thread.Join();
+  thread.SetPriority(3);
+  thread.SetStackDepth(100);
+
   return result;
 }
 
@@ -71,8 +89,8 @@ bool TwoThreadTest(TestSuite::Logger logger) {
     }
   });
 
-  // TODO: Replace with Thread Joining
-  fw::os::Delay(100);
+  t1.Join();
+  t2.Join();
 
   if (!count2_intermediate) {
     logger(
@@ -112,8 +130,8 @@ bool ThreadPriority(TestSuite::Logger logger) {
 
   thread2.Start([&t2_start]() { t2_start = true; });
 
-  // TODO: Replace with Join once available.
-  fw::os::Delay(kRunTime * 2);
+  thread.Join();
+  thread2.Join();
 
   // We expect thread1 to have not seen thread2 start, but thread2 to still
   // finish after thread1 has.
@@ -162,9 +180,8 @@ bool BlockingMutex(TestSuite::Logger logger) {
     return false;
   }
 
-  // TODO: Replace with Join().
   run = false;
-  fw::os::Delay(20);
+  thread.Join();
 
   return true;
 }
@@ -253,7 +270,7 @@ bool SemaphoreTest(TestSuite::Logger logger) {
 
     run = false;
     CHECK(sem.Give());
-    fw::os::Delay(10);
+    thread.Join();
 
     sem.Give();
     if (!sem.TryTakeFor(10)) {
@@ -277,6 +294,7 @@ void fw::os::AppMain() {
   TestSuite suite;
   suite.RunTest("TestDelayAndMillis", &TestDelayAndMillis);
   suite.RunTest("ThreadExecutesWithArguments", &ThreadExecutesWithArguments);
+  suite.RunTest("ThreadJoins", &ThreadJoins);
   suite.RunTest("TwoThreadTest", &TwoThreadTest);
   suite.RunTest("ThreadPriority", &ThreadPriority);
   suite.RunTest("BlockingMutex", &BlockingMutex);

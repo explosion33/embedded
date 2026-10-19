@@ -102,7 +102,8 @@ def main(binary_rlocation: str, target: str, negative: bool):
         test_names = []
         test_statuses = []
         while True:
-            if msg := _get_text(ser.readline().decode("utf-8").strip(), TEST_PREFIX):
+            line = ser.readline().decode("utf-8").strip()
+            if msg := _get_text(line, TEST_PREFIX):
                 if TEST_PASS in msg:
                     test_statuses.append(True)
                     if len(test_statuses) != len(test_names):
@@ -132,6 +133,9 @@ def main(binary_rlocation: str, target: str, negative: bool):
                     break
                 else:
                     error(f"Got malformed message: {msg}")
+            elif line:
+                with terminal_color(TerminalColor.GREY):
+                    print(line)
 
         if len(test_statuses) == 0:
             error("Received no test results, but got test end.")
