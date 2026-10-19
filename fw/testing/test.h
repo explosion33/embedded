@@ -4,6 +4,7 @@
 
 #include "fw/log/failure_stream.h"
 #include "fw/testing/test_suite.h"
+#include "fw/testing/test_suite_interface.h"
 
 namespace fw::testing {
 namespace internal {
@@ -11,7 +12,7 @@ namespace internal {
 // Defines the data needed to run a test.
 struct Test {
   std::string name;
-  std::function<bool(TestSuite::Logger)> fn;
+  std::function<void(TestSuiteInterface&)> fn;
 };
 
 // Gets a vector of all registered tests.
@@ -26,21 +27,21 @@ struct TestRegisterer {
 // Helper to both log a failure and then return. = binds more loosly than << so
 // the entire stream is joined and passed.
 struct ReturnFailure {
-  bool operator=(const fw::log::FailureStream& stream) {
+  void operator=(const fw::log::FailureStream& stream) {
     TestSuite::Log(stream.Text());
-    return false;
+    return;
   }
 };
 
 }  // namespace internal
 
 #define TEST(name)                                              \
-  bool name(fw::testing::TestSuite::Logger logger);             \
+  void name(fw::testing::TestSuiteInterface&);                  \
   static fw::testing::internal::TestRegisterer register_##name( \
       new fw::testing::internal::Test{#name, &name});           \
-  bool name(fw::testing::TestSuite::Logger logger)
+  void name(fw::testing::TestSuiteInterface& _handle)
 
-#define LOG() logger()
+#define LOG() _handle.Log()
 
 #define ASSERT_TRUE(cond)                             \
   switch (0)                                          \
@@ -48,7 +49,8 @@ struct ReturnFailure {
   default:                                            \
     if (cond) {                                       \
     } else                                            \
-      return fw::testing::internal::ReturnFailure() = \
+      return _handle.FailTest(),                      \
+             fw::testing::internal::ReturnFailure() = \
                  fw::log::FailureStream(__FILE__, __LINE__, #cond)
 
 #define ASSERT_FALSE(cond) ASSERT_TRUE(!cond)

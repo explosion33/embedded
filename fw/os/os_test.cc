@@ -8,7 +8,6 @@
 #include "fw/testing/test.h"
 
 namespace {
-using fw::testing::TestSuite;
 
 TEST(TestDelayAndMillis) {
   constexpr size_t kMaxError = 1;
@@ -22,7 +21,6 @@ TEST(TestDelayAndMillis) {
     const size_t diff = millis > elapsed ? millis - elapsed : elapsed - millis;
     ASSERT_LE(diff, kMaxError) << millis;
   }
-  return true;
 }
 
 TEST(ThreadExecutesWithArguments) {
@@ -32,8 +30,6 @@ TEST(ThreadExecutesWithArguments) {
   thread.Start([](bool* result, bool val) { *result = val; }, &result, true);
   thread.Join();
   ASSERT_TRUE(result);
-
-  return true;
 }
 
 TEST(ThreadJoins) {
@@ -51,8 +47,6 @@ TEST(ThreadJoins) {
   thread.SetStackDepth(100);
 
   ASSERT_TRUE(result);
-
-  return true;
 }
 
 TEST(TwoThreadTest) {
@@ -88,8 +82,6 @@ TEST(TwoThreadTest) {
   ASSERT_TRUE(count2_intermediate);
   ASSERT_EQ(count1, kCount);
   ASSERT_EQ(count2, kCount);
-
-  return true;
 }
 
 TEST(ThreadPriority) {
@@ -125,8 +117,6 @@ TEST(ThreadPriority) {
   // finish after thread1 has.
   ASSERT_TRUE(result);
   ASSERT_TRUE(t2_start);
-
-  return true;
 }
 
 TEST(BlockingMutex) {
@@ -162,8 +152,6 @@ TEST(BlockingMutex) {
 
   run = false;
   thread.Join();
-
-  return true;
 }
 
 TEST(MutexTimeout) {
@@ -185,8 +173,6 @@ TEST(MutexTimeout) {
   // Unlocking the mutex should acquire the lock.
   mutex.Unlock();
   ASSERT_TRUE(mutex.TryLockFor(kTimeout));
-
-  return true;
 }
 
 TEST(SemaphoreTest) {
@@ -227,8 +213,6 @@ TEST(SemaphoreTest) {
     ASSERT_TRUE(sem.TryTakeFor(10));
     ASSERT_FALSE(sem.TryTakeFor(10));
   }
-
-  return true;
 }
 
 }  // namespace

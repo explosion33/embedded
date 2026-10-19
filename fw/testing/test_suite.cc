@@ -4,6 +4,7 @@
 #include <string_view>
 
 #include "fw/log/log.h"
+#include "fw/testing/test_suite_interface.h"
 
 namespace fw::testing {
 namespace {
@@ -43,12 +44,14 @@ TestSuite::~TestSuite() {
 void TestSuite::Log(std::string_view msg) { MessageImpl(kTestMsg, msg); }
 
 bool TestSuite::RunTest(std::string_view name,
-                        std::function<bool(Logger)> test) {
+                        std::function<void(TestSuiteInterface&)> test) {
   MessageImpl(kTestStart, name);
-  const bool result = test(Logger{});
+  test(*this);
+  const bool result = !failure_;
+  failure_ = false;
   ran_ = true;
-  MessageImpl(result ? kTestPass : kTestFail);
 
+  MessageImpl(result ? kTestPass : kTestFail);
   return result;
 }
 

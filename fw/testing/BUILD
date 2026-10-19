@@ -9,7 +9,16 @@ cc_library(
     srcs = ["test_suite.cc"],
     hdrs = ["test_suite.h"],
     deps = [
+        ":test_suite_interface",
         "//fw/log",
+        "//fw/log:invocable_stream",
+    ],
+)
+
+cc_library(
+    name = "test_suite_interface",
+    hdrs = ["test_suite_interface.h"],
+    deps = [
         "//fw/log:invocable_stream",
     ],
 )

@@ -7,16 +7,12 @@
 
 namespace {
 
-TEST(test) {
-  LOG() << "This test should pass";
-  return true;
-}
+TEST(test) { LOG() << "This test should pass"; }
 
 TEST(pass_test_test_2) {
   LOG() << "log 1";
   LOG() << "log 2";
   LOG() << "streamed " << "log " << 3;
-  return true;
 }
 
 }  // namespace
