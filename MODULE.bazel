@@ -13,7 +13,7 @@ FREERTOS_KERNEL_VERSION = "11.3.1"
 
 BAZEL_COMPILE_COMMANDS_VERSION = "0.22.4"
 
-# PyOCD Flashing Target Pack versions. 
+# PyOCD Flashing Target Pack versions.
 STM32F4XX_DFP_VERSION = "3.1.1"
 
 module(
@@ -23,6 +23,7 @@ module(
 
 bazel_dep(name = "abseil-cpp", version = "20260526.0")
 bazel_dep(name = "googletest", version = "1.18.0.bcr.1")
+bazel_dep(name = "magic_enum", version = "0.9.8")
 bazel_dep(name = "platforms", version = "1.1.0")
 bazel_dep(name = "rules_cc", version = "0.2.25")
 bazel_dep(name = "rules_python", version = "2.3.3")
@@ -62,6 +63,7 @@ pip.parse(
 use_repo(pip, "pypi")
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 # Fetch the CMSIS Device Family Pack used by pyOCD to describe STM32F4 targets.
