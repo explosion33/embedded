@@ -1,7 +1,9 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 _PIN_MAP_TEMPLATE = Label("//generators/pins:pin_map_template")
+_FORWARD_PIN_MAP_TEMPLATE = Label("//generators/pins:forward_pin_map_template")
 _STM32_PIN_TO_PIN_MAP = "//generators/pins:pin_map_from_stm32_xml"
+_FORWARD_PIN_MAP = "//generators/pins:forward_pin_map"
 
 def _pin_map_from_stm32_xml_impl(
         name,
@@ -45,6 +47,49 @@ pin_map_from_stm32_xml = macro(
             mandatory = True,
             configurable = False,
         ),
+        "namespace": attr.string(
+            doc = "The C++ namespace the generated mapping code is under.",
+            mandatory = True,
+            configurable = False,
+        ),
+    },
+)
+
+def _forward_pin_map_impl(
+        name,
+        visibility,
+        namespace):
+    output_file = name + ".h"
+
+    cmd = " ".join([
+        "$(location {})".format(_FORWARD_PIN_MAP),
+        "--template $(location {})".format(_FORWARD_PIN_MAP_TEMPLATE),
+        "--output $@",
+        "--namespace {}".format(namespace),
+    ])
+
+    native.genrule(
+        name = name + "_header",
+        srcs = [_FORWARD_PIN_MAP_TEMPLATE],
+        outs = [output_file],
+        cmd = cmd,
+        tools = [_FORWARD_PIN_MAP],
+    )
+
+    cc_library(
+        name = name,
+        hdrs = [output_file],
+        visibility = visibility,
+    )
+
+forward_pin_map = macro(
+    doc = """Generate a C++ forward declared Pin Map file.
+    
+    Emits a header ``<name>.h`` containing a Pin and Port enum definition and
+    definitions for helper functions. Does not include implementations.
+    """,
+    implementation = _forward_pin_map_impl,
+    attrs = {
         "namespace": attr.string(
             doc = "The C++ namespace the generated mapping code is under.",
             mandatory = True,
