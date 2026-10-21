@@ -73,12 +73,15 @@ cc_library(
 )
 
 cc_library(
-    name = "gpio",
-    srcs = ["gpio.cc"],
-    hdrs = ["gpio.h"],
+    name = "gpio_output",
+    srcs = ["gpio_output.cc"],
+    hdrs = ["gpio_output.h"],
     target_compatible_with = TARGET_COMPATIBLE_WITH,
     visibility = ["//visibility:public"],
-    deps = [":ll"],
+    deps = [
+        ":ll",
+        "//fw/platform/peripherals:gpio_output_interface",
+    ],
 )
 
 cc_library(

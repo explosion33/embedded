@@ -8,7 +8,7 @@
 
 // TODO: This file is very clauded. This should be cleaned up and moved to a
 // standard interface to be shared across platforms.
-namespace platform {
+namespace fw::platform {
 
 // Struct containing the config required to bringup uart.
 struct UartConfig {
@@ -62,4 +62,4 @@ class Uart {
   USART_TypeDef* usart_;
 };
 
-}  // namespace platform
+}  // namespace fw::platform

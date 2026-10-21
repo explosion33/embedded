@@ -9,6 +9,6 @@ cc_fw_app(
         "//fw/os:thread",
         "//fw/os:time",
         "//fw/platform/stm32f4/common:freertos",
-        "//fw/platform/stm32f4/common:gpio",
+        "//fw/platform/stm32f4/common:gpio_output",
     ],
 )

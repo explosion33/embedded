@@ -1,13 +1,14 @@
-#include "fw/platform/stm32f4/common/gpio.h"
+#include "fw/platform/stm32f4/common/gpio_output.h"
 
 #include <cstdint>
 
+#include "fw/platform/stm32f4/common/gpio_output.h"
 #include "stm32f4xx_ll_bus.h"
 #include "stm32f4xx_ll_gpio.h"
 
-namespace platform {
+namespace fw::platform {
 
-OutputPin::OutputPin(const OutputPinConfig& config)
+GpioOutput::GpioOutput(const OutputPinConfig& config)
     : port_(config.port), pin_(config.pin) {
   LL_AHB1_GRP1_EnableClock(config.port_clock);
 
@@ -26,7 +27,7 @@ OutputPin::OutputPin(const OutputPinConfig& config)
   LL_GPIO_Init(port_, &gpio_init);
 }
 
-void OutputPin::Set(bool high) {
+void GpioOutput::Set(bool high) {
   if (high) {
     LL_GPIO_SetOutputPin(port_, pin_);
   } else {
@@ -34,6 +35,6 @@ void OutputPin::Set(bool high) {
   }
 }
 
-void OutputPin::Toggle() { LL_GPIO_TogglePin(port_, pin_); }
+void GpioOutput::Toggle() { LL_GPIO_TogglePin(port_, pin_); }
 
-}  // namespace platform
+}  // namespace fw::platform

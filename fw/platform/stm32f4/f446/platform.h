@@ -4,8 +4,8 @@
 
 #include <cstdint>
 
-namespace platform {
+namespace fw::platform {
 
 // By default the MCU boots on the 16MHz HSI, with no PLLs configured.
 constexpr uint32_t kDefaultSysClkHz = 16'000'000;
-}  // namespace platform
+}  // namespace fw::platform

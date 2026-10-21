@@ -2,7 +2,7 @@
 
 // Board configuration for the Nucleo-F446RE.
 
-#include "fw/platform/stm32f4/common/gpio.h"
+#include "fw/platform/stm32f4/common/gpio_output.h"
 #include "fw/platform/stm32f4/common/uart.h"
 #include "stm32f4xx_ll_bus.h"
 #include "stm32f4xx_ll_gpio.h"
