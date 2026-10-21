@@ -10,7 +10,7 @@
 #include "fw/os/main.h"
 #include "fw/os/thread.h"
 #include "fw/os/time.h"
-#include "fw/platform/stm32f4/common/gpio.h"
+#include "fw/platform/stm32f4/common/gpio_output.h"
 
 namespace {
 
@@ -19,7 +19,7 @@ constexpr size_t kLogPeriodMs = 1000;
 
 // Blinks the UserLED at `kBlinkPeriod`.
 void BlinkTask() {
-  platform::OutputPin led(fw::board::kUserLed);
+  fw::platform::GpioOutput led(fw::board::kUserLed);
   while (true) {
     led.Toggle();
     fw::os::Delay(kBlinkPeriodMs);

@@ -66,9 +66,19 @@ void LogInfoBlocking(const char* fmt, ...) {
   backend::Write("INFO: ");
 
   va_list args;
+  va_list args2;
   va_start(args, fmt);
-  LogBlocking(fmt, args);
+  va_copy(args2, args);
+  const size_t size = vsnprintf(nullptr, 0, fmt, args);
   va_end(args);
+
+  char* buf = new char[size + 1];
+  vsnprintf(buf, size + 1, fmt, args2);
+  backend::Write(std::string_view(buf, size));
+  delete[] buf;
+
+  va_end(args2);
+
   backend::Write("\r\n");
 }
 
