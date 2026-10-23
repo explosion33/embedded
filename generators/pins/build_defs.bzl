@@ -1,6 +1,7 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
-_PIN_MAP_TEMPLATE = Label("//generators/pins:pin_map_template")
+_PIN_MAP_H_TEMPLATE = Label("//generators/pins:pin_map_h_template")
+_PIN_MAP_CC_TEMPLATE = Label("//generators/pins:pin_map_cc_template")
 _FORWARD_PIN_MAP_TEMPLATE = Label("//generators/pins:forward_pin_map_template")
 _STM32_PIN_TO_PIN_MAP = "//generators/pins:pin_map_from_stm32_xml"
 _FORWARD_PIN_MAP = "//generators/pins:forward_pin_map"
@@ -10,27 +11,33 @@ def _pin_map_from_stm32_xml_impl(
         visibility,
         xml_file,
         namespace):
-    output_file = name + ".h"
+    output_h = name + ".h"
+    output_cc = name + ".cc"
+    header_include = "{}/{}".format(native.package_name(), output_h)
 
     cmd = " ".join([
         "$(location {})".format(_STM32_PIN_TO_PIN_MAP),
         "--path $(location {})".format(xml_file),
-        "--template $(location {})".format(_PIN_MAP_TEMPLATE),
-        "--output $@",
+        "--template_h $(location {})".format(_PIN_MAP_H_TEMPLATE),
+        "--template_cc $(location {})".format(_PIN_MAP_CC_TEMPLATE),
+        "--output_h $(location {})".format(output_h),
+        "--output_cc $(location {})".format(output_cc),
         "--namespace {}".format(namespace),
+        "--header_path {}".format(header_include),
     ])
 
     native.genrule(
         name = name + "_header",
-        srcs = [_PIN_MAP_TEMPLATE, xml_file],
-        outs = [output_file],
+        srcs = [_PIN_MAP_H_TEMPLATE, _PIN_MAP_CC_TEMPLATE, xml_file],
+        outs = [output_h, output_cc],
         cmd = cmd,
         tools = [_STM32_PIN_TO_PIN_MAP],
     )
 
     cc_library(
         name = name,
-        hdrs = [output_file],
+        hdrs = [output_h],
+        srcs = [output_cc],
         visibility = visibility,
     )
 
