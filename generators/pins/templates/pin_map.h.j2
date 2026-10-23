@@ -19,36 +19,11 @@ enum class Port : uint8_t {
 };
 
 // Returns true if the pin supports GPIO Output. nullopt for invalid pins.
-constexpr std::optional<bool> SupportsOutput(Pin pin) {
-    switch (pin) {
-        {% for pin in pins %}
-        case Pin::{{ pin.enum_name }}:
-            return {{ pin.output | string | lower }};
-        {% endfor %}
-    }
-    return std::nullopt;
-}
+std::optional<bool> SupportsOutput(Pin pin);
 
 // Returns the port for the provided `pin`, or nullopt if the pin is not valid.
-constexpr std::optional<Port> GetPort(Pin pin) {
-    switch (pin) {
-        {% for pin in pins %}
-        case Pin::{{ pin.enum_name }}:
-            return Port::{{ pin.port_enum }};
-        {% endfor %}
-    }
-    return std::nullopt;
-}
+std::optional<Port> GetPort(Pin pin);
 
 // Returns the pin index for the provided `pin`, or nullopt if the pin is not valid.
-constexpr std::optional<uint8_t> GetPinIndex(Pin pin) {
-    switch (pin) {
-        {% for pin in pins %}
-        case Pin::{{ pin.enum_name }}:
-            return {{ pin.pin_idx }};
-        {% endfor %}
-    }
-    return std::nullopt;
-}
-
+std::optional<uint8_t> GetPinIndex(Pin pin);
 } // {{ namespace }}

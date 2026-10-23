@@ -37,30 +37,48 @@ class Pin:
 
 @click.command()
 @click.option("--path", required=True, type=pathlib.Path)
-@click.option("--template", required=True, type=pathlib.Path)
-@click.option("--output", required=True, type=pathlib.Path)
+@click.option("--template_h", required=True, type=pathlib.Path)
+@click.option("--template_cc", required=True, type=pathlib.Path)
+@click.option("--output_h", required=True, type=pathlib.Path)
+@click.option("--output_cc", required=True, type=pathlib.Path)
 @click.option("--namespace", required=True, type=str)
+@click.option("--header_path", required=True, type=str)
 def main(
     path: pathlib.Path,
-    template: pathlib.Path,
-    output: pathlib.Path,
+    template_h: pathlib.Path,
+    template_cc: pathlib.Path,
+    output_h: pathlib.Path,
+    output_cc: pathlib.Path,
     namespace: str,
+    header_path: str,
 ):
     xml = stm32_xml_parser.Stm32Xml(path)
 
+    if template_h.parent != template_cc.parent:
+        raise ValueError("Templates must be in same directroy.")
+
     env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(template.parent), trim_blocks=True, lstrip_blocks=True
+        loader=jinja2.FileSystemLoader(template_h.parent), trim_blocks=True, lstrip_blocks=True
     )
-    j2_template = env.get_template(template.name)
+    j2_h_template = env.get_template(template_h.name)
+    j2_cc_template = env.get_template(template_cc.name)
 
     pins = [Pin.from_xml(pin) for pin in xml.get_gpio_pins()]
     ports = set(pin.port_enum for pin in pins)
-    content = j2_template.render(
+    content_h = j2_h_template.render(
         namespace=namespace,
         pins=pins,
         ports=ports,
     )
-    output.write_text(content)
+    output_h.write_text(content_h)
+
+    content_cc = j2_cc_template.render(
+        header_path=header_path,
+        namespace=namespace,
+        pins=pins,
+        ports=ports,
+    )
+    output_cc.write_text(content_cc)
 
 
 if __name__ == "__main__":
