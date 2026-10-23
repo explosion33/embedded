@@ -81,6 +81,7 @@ cc_library(
     deps = [
         ":ll",
         "//fw/platform/peripherals:gpio_output_interface",
+        "//fw/platform/peripherals:pin_map",
     ],
 )
 

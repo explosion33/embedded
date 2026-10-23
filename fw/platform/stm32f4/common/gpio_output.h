@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "fw/platform/peripherals/gpio_output_interface.h"
+#include "fw/platform/peripherals/pin_map.h"
 #include "stm32f4xx_ll_gpio.h"
 
 namespace fw::platform {
