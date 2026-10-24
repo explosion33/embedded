@@ -261,6 +261,9 @@ TEST(ThreadPause) {
   thread.Resume();
   Delay(20);
   ASSERT_GT(count, 0);
+
+  thread.Stop();
+  thread.Join();
 }
 
 }  // namespace
