@@ -80,6 +80,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":ll",
+        "//fw/log:check",
         "//fw/platform/peripherals:gpio_output_interface",
         "//fw/platform/peripherals:pin_map",
     ],
