@@ -1,0 +1,22 @@
+#pragma once
+#include <cstdint>
+#include <optional>
+
+namespace {{ namespace }} {
+
+// Non-ordered enumeration over all pins for this target.
+enum class Pin : uint8_t;
+
+// Non-ordered enumeration over all ports for this target.
+enum class Port : uint8_t;
+
+// Returns true if the pin supports GPIO Output. nullopt for invalid pins.
+constexpr std::optional<bool> SupportsOutput(Pin pin);
+
+// Returns the port for the provided `pin`, or nullopt if the pin is not valid.
+constexpr std::optional<Port> GetPort(Pin pin);
+
+// Returns the pin index for the provided `pin`, or nullopt if the pin is not valid.
+constexpr std::optional<uint8_t> GetPinIndex(Pin pin);
+
+} // {{ namespace }}

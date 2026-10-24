@@ -1,3 +1,4 @@
+#include "generators/pins/pin_map.h"
 #include "generators/pins/sample_stm32_pin_map.h"
 #include "gtest/gtest.h"
 #include "magic_enum/magic_enum.hpp"
