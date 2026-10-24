@@ -42,6 +42,7 @@ constexpr uint32_t GetLLPin(uint8_t pin_idx) {
 
 GpioOutput::GpioOutput(Pin pin)
     : port_(Unwrap(GetPort(pin))), pin_(Unwrap(GetPinIndex(pin))) {
+  CHECK(Unwrap(SupportsOutput(pin)));
   const auto ll_port = GetLLPort(port_);
   const auto ll_pin = GetLLPin(pin_);
 
