@@ -2,7 +2,7 @@ import pathlib
 import tempfile
 import unittest
 
-from generators.pins import stm32_xml_parser
+from generators.stm32.pins import stm32_xml_parser
 
 
 def _construct_with(text: str) -> stm32_xml_parser.Stm32Xml:

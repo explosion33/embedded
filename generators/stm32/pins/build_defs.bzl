@@ -1,10 +1,10 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
-_PIN_MAP_H_TEMPLATE = Label("//generators/pins:pin_map_h_template")
-_PIN_MAP_CC_TEMPLATE = Label("//generators/pins:pin_map_cc_template")
-_FORWARD_PIN_MAP_TEMPLATE = Label("//generators/pins:forward_pin_map_template")
-_STM32_PIN_TO_PIN_MAP = "//generators/pins:pin_map_from_stm32_xml"
-_FORWARD_PIN_MAP = "//generators/pins:forward_pin_map"
+_PIN_MAP_H_TEMPLATE = Label("//generators/stm32/pins:pin_map_h_template")
+_PIN_MAP_CC_TEMPLATE = Label("//generators/stm32/pins:pin_map_cc_template")
+_FORWARD_PIN_MAP_TEMPLATE = Label("//generators/stm32/pins:forward_pin_map_template")
+_STM32_PIN_TO_PIN_MAP = "//generators/stm32/pins:pin_map_from_stm32_xml"
+_FORWARD_PIN_MAP = "//generators/stm32/pins:forward_pin_map"
 
 def _pin_map_from_stm32_xml_impl(
         name,

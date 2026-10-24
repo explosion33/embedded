@@ -1,5 +1,5 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("//generators/pins:build_defs.bzl", "forward_pin_map")
+load("//generators/stm32/pins:build_defs.bzl", "forward_pin_map")
 
 package(default_visibility = ["//fw:__subpackages__"])
 
