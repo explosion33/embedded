@@ -125,6 +125,35 @@ cc_args(
     tags = ["manual"],
 )
 
+config_setting(
+    name = "opt",
+    values = {"compilation_mode": "opt"},
+)
+
+config_setting(
+    name = "dbg",
+    values = {"compilation_mode": "dbg"},
+)
+
+# Firmware is optimized for size by default, since -O0 frames are large enough
+# to overflow small task stacks. -c dbg trades that for debuggability.
+cc_args(
+    name = "optimization_args",
+    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    args = select({
+        ":dbg": [
+            "-Og",
+            "-g3",
+        ],
+        ":opt": ["-Os"],
+        "//conditions:default": [
+            "-Os",
+            "-g",
+        ],
+    }),
+    tags = ["manual"],
+)
+
 cc_args(
     name = "link_args",
     actions = ["@rules_cc//cc/toolchains/actions:link_actions"],
@@ -147,6 +176,7 @@ cc_toolchain(
         ":relative_path_args",
         ":no_runtime_args",
         ":section_args",
+        ":optimization_args",
         ":link_args",
     ],
     compiler = "gcc",
