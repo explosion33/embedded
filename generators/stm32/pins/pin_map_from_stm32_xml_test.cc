@@ -45,5 +45,22 @@ TEST(PinMapStm32Xml, StablePortValue) {
   EXPECT_EQ(static_cast<size_t>(Unwrap(GetPort(Pin::kPH1))), 'H' - 'A');
 }
 
+TEST(PinMapStm32Xml, UsartPins) {
+  EXPECT_TRUE(IsUsartRx(Usart::k2, Pin::kPC13));
+  EXPECT_FALSE(IsUsartRx(Usart::k2, Pin::kPC0));
+  EXPECT_TRUE(IsUsartRx(Usart::k4, Pin::kPC1));
+  EXPECT_FALSE(IsUsartRx(Usart::k4, Pin::kPC13));
+
+  EXPECT_TRUE(IsUsartTx(Usart::k2, Pin::kPC0));
+  EXPECT_TRUE(IsUsartTx(Usart::k4, Pin::kPC0));
+  EXPECT_FALSE(IsUsartTx(Usart::k2, Pin::kPH0));
+  EXPECT_FALSE(IsUsartTx(Usart::k4, Pin::kPH0));
+}
+
+TEST(PinMapStm32Xml, UsartStableOrdering) {
+  EXPECT_EQ(static_cast<size_t>(Usart::k2), 2);
+  EXPECT_EQ(static_cast<size_t>(Usart::k4), 4);
+}
+
 }  // namespace
 }  // namespace generators::pins

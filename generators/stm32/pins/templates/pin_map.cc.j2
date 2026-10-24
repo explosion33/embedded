@@ -7,6 +7,38 @@
 
 namespace {{ namespace }} {
 
+constexpr bool IsUsartRxImpl(Usart usart, Pin pin) {
+    switch (usart) {
+        {% for usart in usarts %}
+        case Usart::{{ usart.enum.enum_name }}:
+            switch (pin) {
+                {% for pin in usart.rx_pins %}
+                case Pin::{{ pin.enum_name }}:
+                    return true;
+                {% endfor %}
+                default:
+                    return false;
+            }
+        {% endfor %}
+    }
+}
+
+constexpr bool IsUsartTxImpl(Usart usart, Pin pin) {
+    switch (usart) {
+        {% for usart in usarts %}
+        case Usart::{{ usart.enum.enum_name }}:
+            switch (pin) {
+                {% for pin in usart.tx_pins %}
+                case Pin::{{ pin.enum_name }}:
+                    return true;
+                {% endfor %}
+                default:
+                    return false;
+            }
+        {% endfor %}
+    }
+    return false;
+}
 
 struct PinInfo {
     Port port;
@@ -47,6 +79,14 @@ std::optional<uint8_t> GetPinIndex(Pin pin) {
         return std::nullopt;
     }
     return info->idx;
+}
+
+bool IsUsartTx(Usart usart, Pin pin) {
+    return IsUsartTxImpl(usart, pin);
+}
+
+bool IsUsartRx(Usart usart, Pin pin) {
+    return IsUsartRxImpl(usart, pin);
 }
 
 } // {{ namespace }}
