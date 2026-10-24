@@ -1,5 +1,5 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("//generators/pins:build_defs.bzl", "pin_map_from_stm32_xml")
+load("//generators/stm32/pins:build_defs.bzl", "pin_map_from_stm32_xml")
 
 package(default_visibility = ["//visibility:public"])
 

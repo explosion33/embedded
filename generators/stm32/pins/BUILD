@@ -2,9 +2,9 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("@rules_python//python:py_binary.bzl", "py_binary")
 load("@rules_python//python:py_test.bzl", "py_test")
-load("//generators/pins:build_defs.bzl", "forward_pin_map", "pin_map_from_stm32_xml")
+load("//generators/stm32/pins:build_defs.bzl", "forward_pin_map", "pin_map_from_stm32_xml")
 
-package(default_visibility = ["//generators/pins:__subpackages__"])
+package(default_visibility = ["//generators/stm32/pins:__subpackages__"])
 
 py_binary(
     name = "stm32_xml_parser",

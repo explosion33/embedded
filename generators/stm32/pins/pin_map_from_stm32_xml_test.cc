@@ -1,8 +1,8 @@
-#include "generators/pins/pin_map_from_stm32_xml_test.h"
+#include "generators/stm32/pins/pin_map_from_stm32_xml_test.h"
 
 #include <optional>
 
-#include "generators/pins/pin_map.h"
+#include "generators/stm32/pins/pin_map.h"
 #include "gtest/gtest.h"
 #include "magic_enum/magic_enum.hpp"
 

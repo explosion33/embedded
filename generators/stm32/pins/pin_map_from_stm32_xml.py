@@ -5,7 +5,7 @@ import re
 import click
 import jinja2
 
-from generators.pins import stm32_xml_parser
+from generators.stm32.pins import stm32_xml_parser
 
 PORT_PIN_REGEX = re.compile(r"^P(?P<port>\w)(?P<pin>\d+).*$")
 
