@@ -19,6 +19,14 @@ enum class Port : uint8_t {
 {% endfor %}
 };
 
+// Enumeration over all USARTs provided by this target. USARTs are numbered
+// by USART index.
+enum class Usart : uint8_t {
+    {% for usart in usarts %}
+        {{ usart.enum.enum_name }} = {{ usart.enum.enum_value }},
+    {% endfor %}
+};
+
 // Returns true if the pin supports GPIO Output. nullopt for invalid pins.
 std::optional<bool> SupportsOutput(Pin pin);
 
@@ -27,4 +35,10 @@ std::optional<Port> GetPort(Pin pin);
 
 // Returns the pin index for the provided `pin`, or nullopt if the pin is not valid.
 std::optional<uint8_t> GetPinIndex(Pin pin);
+
+// Returns true if the provided Pin is a TX pin on the supplied USART.
+bool IsUsartTx(Usart usart, Pin pin);
+
+// Returns true if the provided Pin is a RX pin on the supplied USART.
+bool IsUsartRx(Usart usart, Pin pin);
 } // {{ namespace }}

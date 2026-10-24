@@ -4,6 +4,8 @@ import unittest
 
 from generators.stm32.pins import stm32_xml_parser
 
+Usart = stm32_xml_parser.Stm32Xml.Usart
+
 
 def _construct_with(text: str) -> stm32_xml_parser.Stm32Xml:
     """Constructs a Xml parser with the provided text. text starts at root."""
@@ -39,23 +41,35 @@ class TestStm32Xml(unittest.TestCase):
         xml = _construct_with("""
                 <Mcu>
                     <Pin Name="PA0" Type="I/O">
+                        <Signal Name="USART2_TX"/>
+                        <Signal Name="USART4_RX"/>
+                        <Signal Name="USART2_OTHER_PIN"/>
                         <Signal IOModes="Output" Name="GPIO"/>
                     </Pin>
-                    <Pin Name="PA0" Type="I/O">
+                    <Pin Name="PA2" Type="I/O">
                         <Signal Name="Other"/>
                     </Pin>
-                    <Pin Name="PA0" Type="Other"/>
+                    <Pin Name="PA3" Type="Other"/>
                     <Pin Name="PA1-Suffix" Type="I/O">
                         <Signal Name="Other"/>
                         <Signal IOModes="Input" Name="GPIO"/>
                     </Pin>
                 </Mcu>
                 """)
+        print(xml.get_gpio_pins())
         self.assertCountEqual(
             xml.get_gpio_pins(),
             [
-                stm32_xml_parser.Stm32Xml.GpioPin(name="PA0", output=True),
-                stm32_xml_parser.Stm32Xml.GpioPin(name="PA1-Suffix", output=False),
+                stm32_xml_parser.Stm32Xml.GpioPin(
+                    name="PA0",
+                    output=True,
+                    usarts=[
+                        stm32_xml_parser.Stm32Xml.Usart(2, Usart.PinType.TX),
+                        stm32_xml_parser.Stm32Xml.Usart(4, Usart.PinType.RX),
+                    ],
+                ),
+                stm32_xml_parser.Stm32Xml.GpioPin(name="PA2", output=False, usarts=[]),
+                stm32_xml_parser.Stm32Xml.GpioPin(name="PA1-Suffix", output=False, usarts=[]),
             ],
         )
 

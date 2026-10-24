@@ -43,6 +43,50 @@ class EnumValue:
     enum_value: int
 
 
+@dataclasses.dataclass
+class Usart:
+    enum: EnumValue
+    rx_pins: list[Pin]
+    tx_pins: list[Pin]
+
+
+def get_usarts(xml_pins: list[stm32_xml_parser.Stm32Xml.GpioPin]) -> list[Usart]:
+    usarts: dict[int, list[stm32_xml_parser.Stm32Xml.GpioPin]] = {}
+    for pin in xml_pins:
+        for usart in pin.usarts:
+            if usart.index not in usarts:
+                usarts[usart.index] = []
+            usarts[usart.index].append(pin)
+
+    out: list[Usart] = []
+    for idx in usarts:
+        rx_pins = []
+        tx_pins = []
+        for pin in usarts[idx]:
+            for usart in pin.usarts:
+                if usart.index != idx:
+                    continue
+                if usart.pin_type == stm32_xml_parser.Stm32Xml.Usart.PinType.TX:
+                    tx_pins.append(Pin.from_xml(pin))
+                if usart.pin_type == stm32_xml_parser.Stm32Xml.Usart.PinType.RX:
+                    rx_pins.append(Pin.from_xml(pin))
+
+        if len(rx_pins) == 0:
+            raise click.ClickException(f"Parsed USART {idx} with no RX pins.")
+        if len(tx_pins) == 0:
+            raise click.ClickException(f"Parsed USART {idx} with no TX pins.")
+
+        out.append(
+            Usart(
+                enum=EnumValue(enum_name=f"k{idx}", enum_value=idx),
+                rx_pins=rx_pins,
+                tx_pins=tx_pins,
+            )
+        )
+
+    return out
+
+
 @click.command()
 @click.option("--path", required=True, type=pathlib.Path)
 @click.option("--template_h", required=True, type=pathlib.Path)
@@ -71,16 +115,21 @@ def main(
     j2_h_template = env.get_template(template_h.name)
     j2_cc_template = env.get_template(template_cc.name)
 
-    pins = sorted([Pin.from_xml(pin) for pin in xml.get_gpio_pins()], key=lambda pin: pin.full_name)
+    xml_pins = xml.get_gpio_pins()
+    pins = sorted([Pin.from_xml(pin) for pin in xml_pins], key=lambda pin: pin.full_name)
     ports = sorted(list(set(pin.port for pin in pins)))
     for port in ports:
         if len(port) > 1 or ord(port[0]) < ord("A") or ord(port[0]) > ord("Z"):
             raise click.ClickException(f"Got unsupported port name {port}")
     port_enums = [EnumValue(f"k{port}", ord(port[0]) - ord("A")) for port in ports]
+    usarts = get_usarts(xml_pins)
+    print(usarts)
+
     content_h = j2_h_template.render(
         namespace=namespace,
         pins=pins,
         ports=port_enums,
+        usarts=usarts,
     )
     output_h.write_text(content_h)
 
@@ -89,6 +138,7 @@ def main(
         namespace=namespace,
         pins=pins,
         ports=ports,
+        usarts=usarts,
     )
     output_cc.write_text(content_cc)
 
