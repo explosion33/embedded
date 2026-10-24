@@ -29,7 +29,6 @@ cc_library(
     linkopts = ["-T$(execpath %s)" % LINKER_SCRIPT],
     target_compatible_with = ["//fw/platform/constraints:stm32f446"],
     deps = [
-        "//fw/platform/stm32f4/common:gpio_output",
         "//fw/platform/stm32f4/common:ll",
         "//fw/platform/stm32f4/common:uart",
         "//fw/platform/stm32f4/f446",

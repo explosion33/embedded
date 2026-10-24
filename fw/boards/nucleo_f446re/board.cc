@@ -1,6 +1,8 @@
 #include "fw/boards/nucleo_f446re/board.h"
 
 #include "fw/platform/stm32f4/common/uart.h"
+#include "stm32f4xx_ll_bus.h"
+#include "stm32f4xx_ll_gpio.h"
 
 namespace fw::board {
 
