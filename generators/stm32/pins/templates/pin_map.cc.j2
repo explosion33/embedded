@@ -2,39 +2,51 @@
 
 #include <cstdint>
 #include <optional>
+#include <iterator>
 
 
 namespace {{ namespace }} {
 
 
+struct PinInfo {
+    Port port;
+    uint8_t idx;
+    bool output;
+};
+
+constexpr PinInfo kPinInfo[] = {
+{% for pin in pins %}
+    PinInfo{Port::{{ pin.port_enum }}, {{ pin.pin_idx }}, {{ pin.output | string | lower}} }, // {{ pin.enum_name }}
+{% endfor %}
+};
+
+const PinInfo* GetPinInfo(Pin pin) {
+    const size_t i = static_cast<size_t>(pin);
+    return i < std::size(kPinInfo) ? &kPinInfo[i] : nullptr;
+}
+
 std::optional<bool> SupportsOutput(Pin pin) {
-    switch (pin) {
-        {% for pin in pins %}
-        case Pin::{{ pin.enum_name }}:
-            return {{ pin.output | string | lower }};
-        {% endfor %}
+    const PinInfo* info = GetPinInfo(pin);
+    if (info == nullptr) {
+        return std::nullopt;
     }
-    return std::nullopt;
+    return info->output;
 }
 
 std::optional<Port> GetPort(Pin pin) {
-    switch (pin) {
-        {% for pin in pins %}
-        case Pin::{{ pin.enum_name }}:
-            return Port::{{ pin.port_enum }};
-        {% endfor %}
+    const PinInfo* info = GetPinInfo(pin);
+    if (info == nullptr) {
+        return std::nullopt;
     }
-    return std::nullopt;
+    return info->port;
 }
 
 std::optional<uint8_t> GetPinIndex(Pin pin) {
-    switch (pin) {
-        {% for pin in pins %}
-        case Pin::{{ pin.enum_name }}:
-            return {{ pin.pin_idx }};
-        {% endfor %}
+    const PinInfo* info = GetPinInfo(pin);
+    if (info == nullptr) {
+        return std::nullopt;
     }
-    return std::nullopt;
+    return info->idx;
 }
 
 } // {{ namespace }}
