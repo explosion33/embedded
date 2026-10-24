@@ -11,10 +11,11 @@ enum class Pin : uint8_t {
 {% endfor %}
 };
 
-// Non-ordered enumeration over all ports for this target.
+// Enumeration over all ports supported by this target. Ports are numbered
+// alpha-numerically by port letter, and the enum supports gaps.
 enum class Port : uint8_t {
 {% for port in ports %}
-    {{ port}},
+    {{ port.enum_name }} = {{ port.enum_value }},
 {% endfor %}
 };
 

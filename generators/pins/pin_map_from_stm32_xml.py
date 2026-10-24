@@ -16,6 +16,7 @@ class Pin:
     full_name: str
     output: bool
     port_enum: str
+    port: str
     pin_idx: int
 
     @staticmethod
@@ -31,8 +32,15 @@ class Pin:
             full_name=pin.name,
             output=pin.output,
             port_enum=f"k{port.capitalize()}",
+            port=port.capitalize(),
             pin_idx=pin_idx,
         )
+
+
+@dataclasses.dataclass
+class EnumValue:
+    enum_name: str
+    enum_value: int
 
 
 @click.command()
@@ -63,12 +71,16 @@ def main(
     j2_h_template = env.get_template(template_h.name)
     j2_cc_template = env.get_template(template_cc.name)
 
-    pins = [Pin.from_xml(pin) for pin in xml.get_gpio_pins()]
-    ports = set(pin.port_enum for pin in pins)
+    pins = sorted([Pin.from_xml(pin) for pin in xml.get_gpio_pins()], key=lambda pin: pin.full_name)
+    ports = sorted(list(set(pin.port for pin in pins)))
+    for port in ports:
+        if len(port) > 1 or ord(port[0]) < ord("A") or ord(port[0]) > ord("Z"):
+            raise click.ClickException(f"Got unsupported port name {port}")
+    port_enums = [EnumValue(f"k{port}", ord(port[0]) - ord("A")) for port in ports]
     content_h = j2_h_template.render(
         namespace=namespace,
         pins=pins,
-        ports=ports,
+        ports=port_enums,
     )
     output_h.write_text(content_h)
 
