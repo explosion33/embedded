@@ -133,3 +133,10 @@ register_toolchains("//fw/platform/toolchains/arm_none_eabi:arm_none_eabi_toolch
 stm32_pins = use_extension("//:stm32_xml.bzl", "stm32_pins")
 stm32_pins.download(file_name = "STM32F446R(C-E)Tx.xml")
 use_repo(stm32_pins, "STM32F446R_C_E_Tx")
+
+stm32_data = use_extension("//:stm32_data.bzl", "stm32_data")
+stm32_data.download(
+    chip = "STM32F446RE",
+    sha256 = "9b7b7da3e10f8b445dbd6ca926dc32fad7bb71a1c923d312503f17db45c07206",
+)
+use_repo(stm32_data, "STM32F446RE")
