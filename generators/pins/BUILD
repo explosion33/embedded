@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("@rules_python//python:py_binary.bzl", "py_binary")
 load("@rules_python//python:py_test.bzl", "py_test")
@@ -40,8 +41,13 @@ py_binary(
 )
 
 filegroup(
-    name = "pin_map_template",
+    name = "pin_map_h_template",
     srcs = ["templates/pin_map.h.j2"],
+)
+
+filegroup(
+    name = "pin_map_cc_template",
+    srcs = ["templates/pin_map.cc.j2"],
 )
 
 filegroup(
@@ -65,11 +71,17 @@ pin_map_from_stm32_xml(
     xml_file = ":sample_stm32_xml",
 )
 
+cc_library(
+    name = "pin_map_from_stm32_xml_test_header",
+    hdrs = ["pin_map_from_stm32_xml_test.h"],
+)
+
 cc_test(
     name = "pin_map_from_stm32_xml_test",
     srcs = ["pin_map_from_stm32_xml_test.cc"],
     deps = [
         ":pin_map",
+        ":pin_map_from_stm32_xml_test_header",
         ":sample_stm32_pin_map",
         "@googletest//:gtest_main",
         "@magic_enum",

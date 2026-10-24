@@ -1,0 +1,40 @@
+# include "{{ header_path }}"
+
+#include <cstdint>
+#include <optional>
+
+
+namespace {{ namespace }} {
+
+
+std::optional<bool> SupportsOutput(Pin pin) {
+    switch (pin) {
+        {% for pin in pins %}
+        case Pin::{{ pin.enum_name }}:
+            return {{ pin.output | string | lower }};
+        {% endfor %}
+    }
+    return std::nullopt;
+}
+
+std::optional<Port> GetPort(Pin pin) {
+    switch (pin) {
+        {% for pin in pins %}
+        case Pin::{{ pin.enum_name }}:
+            return Port::{{ pin.port_enum }};
+        {% endfor %}
+    }
+    return std::nullopt;
+}
+
+std::optional<uint8_t> GetPinIndex(Pin pin) {
+    switch (pin) {
+        {% for pin in pins %}
+        case Pin::{{ pin.enum_name }}:
+            return {{ pin.pin_idx }};
+        {% endfor %}
+    }
+    return std::nullopt;
+}
+
+} // {{ namespace }}
