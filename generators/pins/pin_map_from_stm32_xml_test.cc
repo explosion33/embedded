@@ -1,11 +1,19 @@
 #include "generators/pins/pin_map_from_stm32_xml_test.h"
 
+#include <optional>
+
 #include "generators/pins/pin_map.h"
 #include "gtest/gtest.h"
 #include "magic_enum/magic_enum.hpp"
 
 namespace generators::pins {
 namespace {
+template <typename T>
+T Unwrap(std::optional<T> val) {
+  EXPECT_TRUE(val.has_value());
+  return val.value();
+}
+
 TEST(PinMapStm32Xml, PinOutputEnabled) {
   constexpr Pin kFalsePin = Pin::kPC14;
 
@@ -30,6 +38,11 @@ TEST(PinMapStm32Xml, GetPinIndex) {
   EXPECT_EQ(GetPinIndex(Pin::kPC0), 0);
   EXPECT_EQ(GetPinIndex(Pin::kPC1), 1);
   EXPECT_EQ(GetPinIndex(Pin::kPH1), 1);
+}
+
+TEST(PinMapStm32Xml, StablePortValue) {
+  EXPECT_EQ(static_cast<size_t>(Unwrap(GetPort(Pin::kPC0))), 'C' - 'A');
+  EXPECT_EQ(static_cast<size_t>(Unwrap(GetPort(Pin::kPH1))), 'H' - 'A');
 }
 
 }  // namespace
