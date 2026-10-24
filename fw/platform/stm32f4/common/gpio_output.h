@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fw/platform/peripherals/gpio_output_interface.h"
-#include "fw/platform/peripherals/pin_map.h"
+#include "fw/platform/stm32f4/common/pin_map.h"
 
 namespace fw::platform {
 

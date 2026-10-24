@@ -4,8 +4,8 @@
 #include <optional>
 
 #include "fw/log/check.h"
-#include "fw/platform/peripherals/pin_map.h"
 #include "fw/platform/stm32f4/common/gpio_output.h"
+#include "fw/platform/stm32f4/common/pin_map.h"
 #include "stm32f4xx_ll_bus.h"
 #include "stm32f4xx_ll_gpio.h"
 

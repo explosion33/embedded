@@ -1,4 +1,5 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//generators/stm32/pins:build_defs.bzl", "forward_pin_map")
 
 package(default_visibility = ["//fw/platform/stm32f4:__subpackages__"])
 
@@ -72,6 +73,11 @@ cc_library(
     ],
 )
 
+forward_pin_map(
+    name = "pin_map",
+    namespace = "fw::platform",
+)
+
 cc_library(
     name = "gpio_output",
     srcs = ["gpio_output.cc"],
@@ -80,9 +86,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":ll",
+        ":pin_map",
         "//fw/log:check",
         "//fw/platform/peripherals:gpio_output_interface",
-        "//fw/platform/peripherals:pin_map",
     ],
 )
 
