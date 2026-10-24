@@ -2,9 +2,10 @@
 
 #include <cstdint>
 
+#include "fw/platform/peripherals/gpio_output_interface.h"
 #include "stm32f4xx_ll_gpio.h"
 
-namespace platform {
+namespace fw::platform {
 
 // The config required to drive a GPIO pin as a push-pull output.
 struct OutputPinConfig {
@@ -20,9 +21,11 @@ struct OutputPinConfig {
 };
 
 // A GPIO pin configured as a push-pull output, initially low.
-class OutputPin {
+class GpioOutput : public GpioOutputInterface {
  public:
-  explicit OutputPin(const OutputPinConfig& config);
+  struct Config {};
+
+  explicit GpioOutput(const OutputPinConfig& config);
 
   // Drives the pin high when `high`, otherwise low.
   void Set(bool high);
@@ -31,11 +34,11 @@ class OutputPin {
   void Toggle();
 
  private:
-  // The GPIO port this OutputPin uses.
+  // The GPIO port this GpioOutput uses.
   GPIO_TypeDef* port_;
 
-  // The pin this OutputPin uses.
+  // The pin this GpioOutput uses.
   uint32_t pin_;
 };
 
-}  // namespace platform
+}  // namespace fw::platform

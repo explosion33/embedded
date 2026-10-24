@@ -7,7 +7,7 @@
 #include "stm32f4xx_ll_gpio.h"
 #include "stm32f4xx_ll_usart.h"
 
-namespace platform {
+namespace fw::platform {
 
 Uart::Uart(const UartConfig& config) : usart_(config.usart) {
   LL_AHB1_GRP1_EnableClock(config.port_clock);
@@ -64,4 +64,4 @@ void Uart::Write(const char* text) {
   Write(reinterpret_cast<const uint8_t*>(text), size);
 }
 
-}  // namespace platform
+}  // namespace fw::platform
