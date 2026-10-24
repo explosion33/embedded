@@ -1,0 +1,54 @@
+#pragma once
+#include <cstdint>
+#include <optional>
+
+namespace {{ namespace }} {
+
+// Non-ordered enumeration over all pins for this target.
+enum class Pin : uint8_t {
+{% for pin in pins %}
+    {{ pin.enum_name }}, // {{ pin.full_name }}
+{% endfor %}
+};
+
+// Non-ordered enumeration over all ports for this target.
+enum class Port : uint8_t {
+{% for port in ports %}
+    {{ port}},
+{% endfor %}
+};
+
+// Returns true if the pin supports GPIO Output. nullopt for invalid pins.
+constexpr std::optional<bool> SupportsOutput(Pin pin) {
+    switch (pin) {
+        {% for pin in pins %}
+        case Pin::{{ pin.enum_name }}:
+            return {{ pin.output | string | lower }};
+        {% endfor %}
+    }
+    return std::nullopt;
+}
+
+// Returns the port for the provided `pin`, or nullopt if the pin is not valid.
+constexpr std::optional<Port> GetPort(Pin pin) {
+    switch (pin) {
+        {% for pin in pins %}
+        case Pin::{{ pin.enum_name }}:
+            return Port::{{ pin.port_enum }};
+        {% endfor %}
+    }
+    return std::nullopt;
+}
+
+// Returns the pin index for the provided `pin`, or nullopt if the pin is not valid.
+constexpr std::optional<uint8_t> GetPinIndex(Pin pin) {
+    switch (pin) {
+        {% for pin in pins %}
+        case Pin::{{ pin.enum_name }}:
+            return {{ pin.pin_idx }};
+        {% endfor %}
+    }
+    return std::nullopt;
+}
+
+} // {{ namespace }}

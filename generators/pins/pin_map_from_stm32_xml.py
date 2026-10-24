@@ -1,0 +1,67 @@
+import dataclasses
+import pathlib
+import re
+
+import click
+import jinja2
+
+from generators.pins import stm32_xml_parser
+
+PORT_PIN_REGEX = re.compile(r"^P(?P<port>\w)(?P<pin>\d+).*$")
+
+
+@dataclasses.dataclass
+class Pin:
+    enum_name: str
+    full_name: str
+    output: bool
+    port_enum: str
+    pin_idx: int
+
+    @staticmethod
+    def from_xml(pin: stm32_xml_parser.Stm32Xml.GpioPin) -> Pin:
+        match = re.search(PORT_PIN_REGEX, pin.name)
+        if not match:
+            raise click.ClickException(f"Got unexpected pin name: '{pin.name}'")
+        port = match.group("port")
+        pin_idx = int(match.group("pin"))
+
+        return Pin(
+            enum_name=f"kP{port.capitalize()}{pin_idx}",
+            full_name=pin.name,
+            output=pin.output,
+            port_enum=f"k{port.capitalize()}",
+            pin_idx=pin_idx,
+        )
+
+
+@click.command()
+@click.option("--path", required=True, type=pathlib.Path)
+@click.option("--template", required=True, type=pathlib.Path)
+@click.option("--output", required=True, type=pathlib.Path)
+@click.option("--namespace", required=True, type=str)
+def main(
+    path: pathlib.Path,
+    template: pathlib.Path,
+    output: pathlib.Path,
+    namespace: str,
+):
+    xml = stm32_xml_parser.Stm32Xml(path)
+
+    env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(template.parent), trim_blocks=True, lstrip_blocks=True
+    )
+    j2_template = env.get_template(template.name)
+
+    pins = [Pin.from_xml(pin) for pin in xml.get_gpio_pins()]
+    ports = set(pin.port_enum for pin in pins)
+    content = j2_template.render(
+        namespace=namespace,
+        pins=pins,
+        ports=ports,
+    )
+    output.write_text(content)
+
+
+if __name__ == "__main__":
+    main()
