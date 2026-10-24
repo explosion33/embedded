@@ -3,24 +3,21 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 _PIN_MAP_H_TEMPLATE = Label("//generators/stm32/pins:pin_map_h_template")
 _PIN_MAP_CC_TEMPLATE = Label("//generators/stm32/pins:pin_map_cc_template")
 _FORWARD_PIN_MAP_TEMPLATE = Label("//generators/stm32/pins:forward_pin_map_template")
-_STM32_PIN_TO_PIN_MAP = "//generators/stm32/pins:pin_map_from_stm32_xml"
 _STM32_DATA_TO_PIN_MAP = "//generators/stm32/pins:pin_map_from_stm32_data"
 _FORWARD_PIN_MAP = "//generators/stm32/pins:forward_pin_map"
 
-def _generate_pin_map(
+def _pin_map_from_stm32_data_impl(
         name,
         visibility,
-        generator,
-        data_file,
+        json_file,
         namespace):
-    """Runs a pin map `generator` over `data_file`, and wraps the output in a cc_library."""
     output_h = name + ".h"
     output_cc = name + ".cc"
     header_include = "{}/{}".format(native.package_name(), output_h)
 
     cmd = " ".join([
-        "$(location {})".format(generator),
-        "--path $(location {})".format(data_file),
+        "$(location {})".format(_STM32_DATA_TO_PIN_MAP),
+        "--path $(location {})".format(json_file),
         "--template_h $(location {})".format(_PIN_MAP_H_TEMPLATE),
         "--template_cc $(location {})".format(_PIN_MAP_CC_TEMPLATE),
         "--output_h $(location {})".format(output_h),
@@ -31,10 +28,10 @@ def _generate_pin_map(
 
     native.genrule(
         name = name + "_header",
-        srcs = [_PIN_MAP_H_TEMPLATE, _PIN_MAP_CC_TEMPLATE, data_file],
+        srcs = [_PIN_MAP_H_TEMPLATE, _PIN_MAP_CC_TEMPLATE, json_file],
         outs = [output_h, output_cc],
         cmd = cmd,
-        tools = [generator],
+        tools = [_STM32_DATA_TO_PIN_MAP],
     )
 
     cc_library(
@@ -43,41 +40,6 @@ def _generate_pin_map(
         srcs = [output_cc],
         visibility = visibility,
     )
-
-def _pin_map_from_stm32_xml_impl(
-        name,
-        visibility,
-        xml_file,
-        namespace):
-    _generate_pin_map(name, visibility, _STM32_PIN_TO_PIN_MAP, xml_file, namespace)
-
-pin_map_from_stm32_xml = macro(
-    doc = """Generate a C++ Pin Map file from an STM32 XML Target / Board mapping.
-    
-    Emits a header ``<name>.h`` containing a Pin and Port enum for each parsed pin,
-    as well as helper functions surroungding pin capabilities, and enum parsing.
-    """,
-    implementation = _pin_map_from_stm32_xml_impl,
-    attrs = {
-        "xml_file": attr.string(
-            doc = "A bazel file target pointing to the STM32 XML file to parse.",
-            mandatory = True,
-            configurable = False,
-        ),
-        "namespace": attr.string(
-            doc = "The C++ namespace the generated mapping code is under.",
-            mandatory = True,
-            configurable = False,
-        ),
-    },
-)
-
-def _pin_map_from_stm32_data_impl(
-        name,
-        visibility,
-        json_file,
-        namespace):
-    _generate_pin_map(name, visibility, _STM32_DATA_TO_PIN_MAP, json_file, namespace)
 
 pin_map_from_stm32_data = macro(
     doc = """Generate a C++ Pin Map file from an stm32-data chip JSON file.
