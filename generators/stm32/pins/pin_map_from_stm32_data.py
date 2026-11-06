@@ -15,7 +15,7 @@ def get_enum_name(pin_name: str):
     """Gets the enum name for a given pin name."""
     match = re.search(PORT_PIN_REGEX, pin_name)
     if not match:
-        raise click.ClickException(f"Got unexpected pin name: '{pin.name}'")
+        raise click.ClickException(f"Got unexpected pin name: '{pin_name}'")
     port = match.group("port")
     pin_idx = int(match.group("pin"))
     return f"kP{port.capitalize()}{pin_idx}"
