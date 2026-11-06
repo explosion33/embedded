@@ -17,7 +17,6 @@ cc_library(
     hdrs = ["check.h"],
     deps = [
         ":headers",
-        ":log",
         ":stream",
     ],
 )

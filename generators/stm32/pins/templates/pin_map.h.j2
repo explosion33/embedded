@@ -19,6 +19,13 @@ enum class Port : uint8_t {
 {% endfor %}
 };
 
+// Enumeration over all UART peripherals supported by this target.
+enum class Uart : uint8_t {
+{% for uart in uarts %}
+    {{ uart.enum.enum_name }} = {{ uart.enum.enum_value }},
+{% endfor %}
+};
+
 // Returns the port for the provided `pin`, or nullopt if the pin is not valid.
 constexpr Port GetPort(Pin pin) {
     switch (pin) {
@@ -37,4 +44,36 @@ constexpr uint8_t GetPinIndex(Pin pin) {
     }
 }
 
+// Returns the alternate function mapping to the provided uart for a TX pin.
+constexpr std::optional<uint8_t> GetUartTxAf(Uart uart, Pin pin) {
+    switch (uart) {
+        {% for uart in uarts %}
+        case Uart::{{ uart.enum.enum_name }}: {
+            switch (pin) {
+                {% for pin in uart.tx_pins %}
+                case Pin::{{ pin.enum_name }}: return {{ pin.enum_value }};
+                {% endfor %}
+            }
+        }
+        {% endfor %}
+    }
+    return std::nullopt;
+}
+
+
+// Returns the alternate function mapping to the provided uart for a RX pin.
+constexpr std::optional<uint8_t> GetUartRxAf(Uart uart, Pin pin) {
+    switch (uart) {
+        {% for uart in uarts %}
+        case Uart::{{ uart.enum.enum_name }}: {
+            switch (pin) {
+                {% for pin in uart.rx_pins %}
+                case Pin::{{ pin.enum_name }}: return {{ pin.enum_value }};
+                {% endfor %}
+            }
+        }
+        {% endfor %}
+    }
+    return std::nullopt;
+}
 } // {{ namespace }}
