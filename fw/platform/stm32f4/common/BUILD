@@ -37,7 +37,6 @@ cc_library(
     copts = VENDOR_COPTS,
     defines = ["USE_FULL_LL_DRIVER"],
     target_compatible_with = TARGET_COMPATIBLE_WITH,
-    visibility = ["//visibility:public"],
     deps = [
         ":cmsis",
         "@stm32f4xx_hal_driver//:ll_headers",
@@ -71,10 +70,10 @@ cc_library(
 cc_library(
     name = "halt",
     srcs = ["halt.cc"],
+    implementation_deps = [":ll"],
     target_compatible_with = TARGET_COMPATIBLE_WITH,
     visibility = ["//visibility:public"],
     deps = [
-        ":ll",
         "//fw/log:headers",
     ],
 )
@@ -83,7 +82,6 @@ cc_library(
     name = "ll_helpers",
     hdrs = ["ll_helpers.h"],
     target_compatible_with = TARGET_COMPATIBLE_WITH,
-    visibility = ["//visibility:public"],
     deps = [
         "//fw/log:check",
     ],

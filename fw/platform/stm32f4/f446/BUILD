@@ -16,11 +16,11 @@ cc_library(
     name = "f446",
     srcs = ["@cmsis_device_f4//:startup_stm32f446xx_src"],
     hdrs = ["platform.h"],
+    implementation_deps = ["//fw/platform/stm32f4/common:ll"],
     target_compatible_with = ["//fw/platform/constraints:stm32f446"],
     deps = [
         ":stm32f446re_pin_map",
         "//fw/platform/stm32f4/common:crt_stubs",
-        "//fw/platform/stm32f4/common:ll",
     ],
     alwayslink = True,
 )
