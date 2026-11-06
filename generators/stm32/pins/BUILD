@@ -67,6 +67,7 @@ forward_pin_map(
 
 pin_map_from_stm32_data(
     name = "sample_stm32_data_pin_map",
+    include_path = "generators/stm32/pins/sample_stm32_data_pin_map.h",
     json_file = ":sample_stm32_data_json",
     namespace = "generators::pins",
 )

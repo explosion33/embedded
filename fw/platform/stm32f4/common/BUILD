@@ -1,5 +1,4 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("//generators/stm32/pins:build_defs.bzl", "forward_pin_map")
 
 package(default_visibility = ["//fw/platform/stm32f4:__subpackages__"])
 
@@ -73,9 +72,15 @@ cc_library(
     ],
 )
 
-forward_pin_map(
+alias(
     name = "pin_map",
-    namespace = "fw::platform",
+    actual = select(
+        {
+            "//fw/platform/constraints:is_stm32f446": "//fw/platform/stm32f4/f446:stm32f446re_pin_map",
+        },
+        no_match_error = "//fw/platform/stm32f4 has no pin map for this target platform",
+    ),
+    target_compatible_with = TARGET_COMPATIBLE_WITH,
 )
 
 cc_library(
