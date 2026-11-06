@@ -1,0 +1,105 @@
+{
+  "_comment": "Sample chip file trimmed down from https://github.com/embassy-rs/stm32-data-generated/blob/main/data/chips/STM32F446RE.json",
+  "name": "STM32F446RE",
+  "family": "STM32F4",
+  "line": "STM32F446",
+  "cores": [
+    {
+      "name": "cm4",
+      "peripherals": [
+        {
+          "name": "DBGMCU",
+          "address": 3758366720
+        },
+        {
+          "name": "GPIOC",
+          "address": 1073874944,
+          "registers": {
+            "kind": "gpio",
+            "version": "v2",
+            "block": "GPIO"
+          }
+        },
+        {
+          "name": "UART4",
+          "address": 1073761280,
+          "registers": {
+            "kind": "usart",
+            "version": "v2",
+            "block": "USART"
+          },
+          "pins": [
+            {
+              "pin": "PC10",
+              "signal": "TX",
+              "af": 8
+            },
+            {
+              "pin": "PC11",
+              "signal": "RX",
+              "af": 8
+            }
+          ]
+        },
+        {
+          "name": "USART3",
+          "address": 1073760256,
+          "registers": {
+            "kind": "usart",
+            "version": "v2",
+            "block": "USART"
+          },
+          "pins": [
+            {
+              "pin": "PC10",
+              "signal": "TX",
+              "af": 7
+            },
+            {
+              "pin": "PC11",
+              "signal": "RX",
+              "af": 7
+            },
+            {
+              "pin": "PC12",
+              "signal": "CK",
+              "af": 7
+            }
+          ]
+        }
+      ],
+      "pins": [
+        {
+          "name": "PC0"
+        },
+        {
+          "name": "PC1"
+        },
+        {
+          "name": "PC10"
+        },
+        {
+          "name": "PC11"
+        },
+        {
+          "name": "PC12"
+        },
+        {
+          "name": "PC13"
+        },
+        {
+          "name": "PC14"
+        },
+        {
+          "name": "PC15"
+        },
+        {
+          "name": "PH0"
+        },
+        {
+          "name": "PH1"
+        }
+      ]
+    }
+  ]
+}

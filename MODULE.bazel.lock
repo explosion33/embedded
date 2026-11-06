@@ -197,6 +197,26 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
+    "//:stm32_data.bzl%stm32_data": {
+      "general": {
+        "bzlTransitiveDigest": "Qt2AGSuqLcKDxIZM+LkLUivhnVafeGm8ZJMMBumjBqA=",
+        "usagesDigest": "XkVLPC+4EXjlHW+z5j4/r2aKlTcNuuHANNJ8+X9t+I0=",
+        "recordedInputs": [
+          "REPO_MAPPING:,bazel_tools bazel_tools"
+        ],
+        "generatedRepoSpecs": {
+          "STM32F446RE": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://raw.githubusercontent.com/embassy-rs/stm32-data-generated/2f16f70371ce3e0fb6b444532a6dd88a796cea8c/data/chips/STM32F446RE.json"
+              ],
+              "sha256": "9b7b7da3e10f8b445dbd6ca926dc32fad7bb71a1c923d312503f17db45c07206"
+            }
+          }
+        }
+      }
+    },
     "//:stm32_xml.bzl%stm32_pins": {
       "general": {
         "bzlTransitiveDigest": "miLZR0bep2j9/YaWiabzBpplCNno/W5b6DFvMxIw4yI=",
