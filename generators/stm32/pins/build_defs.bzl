@@ -1,10 +1,7 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 _PIN_MAP_H_TEMPLATE = Label("//generators/stm32/pins:pin_map_h_template")
-_PIN_MAP_CC_TEMPLATE = Label("//generators/stm32/pins:pin_map_cc_template")
-_FORWARD_PIN_MAP_TEMPLATE = Label("//generators/stm32/pins:forward_pin_map_template")
 _STM32_DATA_TO_PIN_MAP = "//generators/stm32/pins:pin_map_from_stm32_data"
-_FORWARD_PIN_MAP = "//generators/stm32/pins:forward_pin_map"
 
 def _pin_map_from_stm32_data_impl(
         name,
@@ -24,17 +21,14 @@ def _pin_map_from_stm32_data_impl(
         "$(location {})".format(_STM32_DATA_TO_PIN_MAP),
         "--path $(location {})".format(json_file),
         "--template_h $(location {})".format(_PIN_MAP_H_TEMPLATE),
-        "--template_cc $(location {})".format(_PIN_MAP_CC_TEMPLATE),
         "--output_h $(location {})".format(output_h),
-        "--output_cc $(location {})".format(output_cc),
         "--namespace {}".format(namespace),
-        "--header_path {}".format(include_path),
     ])
 
     native.genrule(
         name = name + "_header",
-        srcs = [_PIN_MAP_H_TEMPLATE, _PIN_MAP_CC_TEMPLATE, json_file],
-        outs = [output_h, output_cc],
+        srcs = [_PIN_MAP_H_TEMPLATE, json_file],
+        outs = [output_h],
         cmd = cmd,
         tools = [_STM32_DATA_TO_PIN_MAP],
     )
@@ -42,7 +36,6 @@ def _pin_map_from_stm32_data_impl(
     cc_library(
         name = name,
         hdrs = [output_h],
-        srcs = [output_cc],
         strip_include_prefix = output_dir,
         include_prefix = include_dir,
         visibility = visibility,
@@ -69,49 +62,6 @@ pin_map_from_stm32_data = macro(
         ),
         "include_path": attr.string(
             doc = """The path the generated header is included by from its consumers.""",
-            mandatory = True,
-            configurable = False,
-        ),
-    },
-)
-
-def _forward_pin_map_impl(
-        name,
-        visibility,
-        namespace):
-    output_file = name + ".h"
-
-    cmd = " ".join([
-        "$(location {})".format(_FORWARD_PIN_MAP),
-        "--template $(location {})".format(_FORWARD_PIN_MAP_TEMPLATE),
-        "--output $@",
-        "--namespace {}".format(namespace),
-    ])
-
-    native.genrule(
-        name = name + "_header",
-        srcs = [_FORWARD_PIN_MAP_TEMPLATE],
-        outs = [output_file],
-        cmd = cmd,
-        tools = [_FORWARD_PIN_MAP],
-    )
-
-    cc_library(
-        name = name,
-        hdrs = [output_file],
-        visibility = visibility,
-    )
-
-forward_pin_map = macro(
-    doc = """Generate a C++ forward declared Pin Map file.
-    
-    Emits a header ``<name>.h`` containing a Pin and Port enum definition and
-    definitions for helper functions. Does not include implementations.
-    """,
-    implementation = _forward_pin_map_impl,
-    attrs = {
-        "namespace": attr.string(
-            doc = "The C++ namespace the generated mapping code is under.",
             mandatory = True,
             configurable = False,
         ),
