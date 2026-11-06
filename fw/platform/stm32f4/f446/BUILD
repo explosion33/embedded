@@ -1,5 +1,5 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("//generators/stm32/pins:build_defs.bzl", "pin_map_from_stm32_xml")
+load("//generators/stm32/pins:build_defs.bzl", "pin_map_from_stm32_data")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -26,14 +26,14 @@ cc_library(
 )
 
 filegroup(
-    name = "stm32f446re_pins_xml",
+    name = "stm32f446re_chip_json",
     srcs = [
-        "@STM32F446R_C_E_Tx//file",
+        "@STM32F446RE//file",
     ],
 )
 
-pin_map_from_stm32_xml(
+pin_map_from_stm32_data(
     name = "stm32f446re_pin_map",
+    json_file = ":stm32f446re_chip_json",
     namespace = "fw::platform",
-    xml_file = ":stm32f446re_pins_xml",
 )
