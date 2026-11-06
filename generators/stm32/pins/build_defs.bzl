@@ -10,10 +10,15 @@ def _pin_map_from_stm32_data_impl(
         name,
         visibility,
         json_file,
-        namespace):
-    output_h = name + ".h"
+        namespace,
+        include_path):
+    include_dir, _, header_name = include_path.rpartition("/")
+
+    # Generate into its own directory so that prefix can be swapped for
+    # `include_dir`. Symbolic macros require outputs be prefixed by `<name>_`.
+    output_dir = name + "_include"
+    output_h = "{}/{}".format(output_dir, header_name)
     output_cc = name + ".cc"
-    header_include = "{}/{}".format(native.package_name(), output_h)
 
     cmd = " ".join([
         "$(location {})".format(_STM32_DATA_TO_PIN_MAP),
@@ -23,7 +28,7 @@ def _pin_map_from_stm32_data_impl(
         "--output_h $(location {})".format(output_h),
         "--output_cc $(location {})".format(output_cc),
         "--namespace {}".format(namespace),
-        "--header_path {}".format(header_include),
+        "--header_path {}".format(include_path),
     ])
 
     native.genrule(
@@ -38,14 +43,17 @@ def _pin_map_from_stm32_data_impl(
         name = name,
         hdrs = [output_h],
         srcs = [output_cc],
+        strip_include_prefix = output_dir,
+        include_prefix = include_dir,
         visibility = visibility,
     )
 
 pin_map_from_stm32_data = macro(
     doc = """Generate a C++ Pin Map file from an stm32-data chip JSON file.
 
-    Emits a header ``<name>.h`` containing a Pin and Port enum for each parsed pin,
-    as well as helper functions surrounding pin capabilities, and enum parsing.
+    Emits a header, included as ``include_path``, containing a Pin and Port enum
+    for each parsed pin, as well as helper functions surrounding pin
+    capabilities, and enum parsing.
     """,
     implementation = _pin_map_from_stm32_data_impl,
     attrs = {
@@ -56,6 +64,11 @@ pin_map_from_stm32_data = macro(
         ),
         "namespace": attr.string(
             doc = "The C++ namespace the generated mapping code is under.",
+            mandatory = True,
+            configurable = False,
+        ),
+        "include_path": attr.string(
+            doc = """The path the generated header is included by from its consumers.""",
             mandatory = True,
             configurable = False,
         ),
