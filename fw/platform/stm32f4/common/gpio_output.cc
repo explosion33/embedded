@@ -13,13 +13,6 @@ namespace fw::platform {
 
 namespace {
 
-// Unwraps a std::optional with FatalError.
-template <typename T>
-constexpr T Unwrap(std::optional<T> val) {
-  CHECK(val.has_value());
-  return val.value();
-}
-
 // Get the LL Port def pointer for this port.
 GPIO_TypeDef* GetLLPort(Port port) {
   GPIO_TypeDef* base = GPIOA;
@@ -40,9 +33,7 @@ constexpr uint32_t GetLLPin(uint8_t pin_idx) {
 
 }  // namespace
 
-GpioOutput::GpioOutput(Pin pin)
-    : port_(Unwrap(GetPort(pin))), pin_(Unwrap(GetPinIndex(pin))) {
-  CHECK(Unwrap(SupportsOutput(pin)));
+GpioOutput::GpioOutput(Pin pin) : port_(GetPort(pin)), pin_(GetPinIndex(pin)) {
   const auto ll_port = GetLLPort(port_);
   const auto ll_pin = GetLLPin(pin_);
 

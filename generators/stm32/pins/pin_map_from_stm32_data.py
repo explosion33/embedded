@@ -48,30 +48,20 @@ class EnumValue:
 @click.command()
 @click.option("--path", required=True, type=pathlib.Path)
 @click.option("--template_h", required=True, type=pathlib.Path)
-@click.option("--template_cc", required=True, type=pathlib.Path)
 @click.option("--output_h", required=True, type=pathlib.Path)
-@click.option("--output_cc", required=True, type=pathlib.Path)
 @click.option("--namespace", required=True, type=str)
-@click.option("--header_path", required=True, type=str)
 def main(
     path: pathlib.Path,
     template_h: pathlib.Path,
-    template_cc: pathlib.Path,
     output_h: pathlib.Path,
-    output_cc: pathlib.Path,
     namespace: str,
-    header_path: str,
 ):
     data = stm32_data_parser.Stm32Data(path)
-
-    if template_h.parent != template_cc.parent:
-        raise ValueError("Templates must be in same directroy.")
 
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(template_h.parent), trim_blocks=True, lstrip_blocks=True
     )
     j2_h_template = env.get_template(template_h.name)
-    j2_cc_template = env.get_template(template_cc.name)
 
     pins = sorted(
         [Pin.from_data(pin) for pin in data.get_gpio_pins()], key=lambda pin: pin.full_name
@@ -87,14 +77,6 @@ def main(
         ports=port_enums,
     )
     output_h.write_text(content_h)
-
-    content_cc = j2_cc_template.render(
-        header_path=header_path,
-        namespace=namespace,
-        pins=pins,
-        ports=ports,
-    )
-    output_cc.write_text(content_cc)
 
 
 if __name__ == "__main__":
