@@ -8,7 +8,7 @@
 namespace fw::board {
 
 // The user LED, LD2 (PA5).
-constexpr platform::Pin kUserLed = platform::Pin::kPA5;
+constexpr platform::pins::Pin kUserLed = platform::pins::Pin::kPA5;
 
 // Returns the console UART, configured from `kConsoleUart` on first use. This
 // is the only instance of the console, shared by the log backend and apps.

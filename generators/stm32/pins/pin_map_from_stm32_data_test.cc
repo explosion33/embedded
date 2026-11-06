@@ -24,5 +24,26 @@ TEST(PinMapStm32Data, StablePortValue) {
   EXPECT_EQ(static_cast<size_t>(GetPort(Pin::kPH1)), 'H' - 'A');
 }
 
+TEST(PinMapStm32Data, StableUartValue) {
+  EXPECT_EQ(static_cast<size_t>(Uart::kUART4), 4);
+  EXPECT_EQ(static_cast<size_t>(Uart::kUSART3), 3);
+}
+
+TEST(PinMapStm32Data, Usart3) {
+  EXPECT_EQ(GetUartTxAf(Uart::kUSART3, Pin::kPC10), 7);
+  EXPECT_EQ(GetUartTxAf(Uart::kUSART3, Pin::kPC11), std::nullopt);
+
+  EXPECT_EQ(GetUartRxAf(Uart::kUSART3, Pin::kPC11), 7);
+  EXPECT_EQ(GetUartRxAf(Uart::kUSART3, Pin::kPC10), std::nullopt);
+}
+
+TEST(PinMapStm32Data, Uart4) {
+  EXPECT_EQ(GetUartTxAf(Uart::kUART4, Pin::kPC10), 8);
+  EXPECT_EQ(GetUartTxAf(Uart::kUART4, Pin::kPC11), std::nullopt);
+
+  EXPECT_EQ(GetUartRxAf(Uart::kUART4, Pin::kPC11), 8);
+  EXPECT_EQ(GetUartRxAf(Uart::kUART4, Pin::kPC10), std::nullopt);
+}
+
 }  // namespace
 }  // namespace generators::pins

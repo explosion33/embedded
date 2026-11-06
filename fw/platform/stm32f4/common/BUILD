@@ -37,7 +37,6 @@ cc_library(
     copts = VENDOR_COPTS,
     defines = ["USE_FULL_LL_DRIVER"],
     target_compatible_with = TARGET_COMPATIBLE_WITH,
-    visibility = ["//visibility:public"],
     deps = [
         ":cmsis",
         "@stm32f4xx_hal_driver//:ll_headers",
@@ -56,19 +55,35 @@ cc_library(
     name = "uart",
     srcs = ["uart.cc"],
     hdrs = ["uart.h"],
+    implementation_deps = [
+        ":ll",
+        ":ll_helpers",
+    ],
     target_compatible_with = TARGET_COMPATIBLE_WITH,
     visibility = ["//visibility:public"],
-    deps = [":ll"],
+    deps = [
+        ":pin_map",
+        "//fw/log:check",
+    ],
 )
 
 cc_library(
     name = "halt",
     srcs = ["halt.cc"],
+    implementation_deps = [":ll"],
     target_compatible_with = TARGET_COMPATIBLE_WITH,
     visibility = ["//visibility:public"],
     deps = [
-        ":ll",
         "//fw/log:headers",
+    ],
+)
+
+cc_library(
+    name = "ll_helpers",
+    hdrs = ["ll_helpers.h"],
+    target_compatible_with = TARGET_COMPATIBLE_WITH,
+    deps = [
+        "//fw/log:check",
     ],
 )
 
@@ -87,10 +102,13 @@ cc_library(
     name = "gpio_output",
     srcs = ["gpio_output.cc"],
     hdrs = ["gpio_output.h"],
+    implementation_deps = [
+        ":ll",
+        ":ll_helpers",
+    ],
     target_compatible_with = TARGET_COMPATIBLE_WITH,
     visibility = ["//visibility:public"],
     deps = [
-        ":ll",
         ":pin_map",
         "//fw/log:check",
         "//fw/platform/peripherals:gpio_output_interface",

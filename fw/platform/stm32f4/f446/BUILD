@@ -16,11 +16,11 @@ cc_library(
     name = "f446",
     srcs = ["@cmsis_device_f4//:startup_stm32f446xx_src"],
     hdrs = ["platform.h"],
+    implementation_deps = ["//fw/platform/stm32f4/common:ll"],
     target_compatible_with = ["//fw/platform/constraints:stm32f446"],
     deps = [
         ":stm32f446re_pin_map",
         "//fw/platform/stm32f4/common:crt_stubs",
-        "//fw/platform/stm32f4/common:ll",
     ],
     alwayslink = True,
 )
@@ -36,5 +36,5 @@ pin_map_from_stm32_data(
     name = "stm32f446re_pin_map",
     include_path = "fw/platform/stm32f4/common/pin_map.h",
     json_file = ":stm32f446re_chip_json",
-    namespace = "fw::platform",
+    namespace = "fw::platform::pins",
 )

@@ -3,52 +3,24 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "stm32f4xx_ll_gpio.h"
-#include "stm32f4xx_ll_usart.h"
+#include "fw/platform/stm32f4/common/pin_map.h"
 
-// TODO: This file is very clauded. This should be cleaned up and moved to a
-// standard interface to be shared across platforms.
 namespace fw::platform {
 
-// Struct containing the config required to bringup uart.
-struct UartConfig {
-  // The uart peripheral to configure.
-  USART_TypeDef* usart;
-
-  // The bit to set in the RCC APB register to clock uart.
-  // TODO: Add better clock definition / comment.
-  uint32_t usart_clock;
-
-  // The GPIO port for the uart pins.
-  GPIO_TypeDef* port;
-
-  // the bit to set in the RCC APB register to clock the GPIO port.
-  // TODO: Add better clock definition / comment.
-  uint32_t port_clock;
-
-  // Transmit and receive pins on `port`, e.g. LL_GPIO_PIN_2, and the
-  // alternate function that maps them to `usart`, e.g. LL_GPIO_AF_7.
-
-  // GPIO pin on `port` to host TX on.
-  uint32_t tx_pin;
-
-  // GPIO pin on `port` to host RX on.
-  uint32_t rx_pin;
-
-  // TODO: what is this.
-  uint32_t alternate;
-
-  // The baud rate to host UART at.
-  uint32_t baud_rate;
-};
-
 // Creates a uart for an stm32f4 MCU.
+// TODO: Expose more uart construction and runtime configuration as needed.
 class Uart {
  public:
-  // Configures Uart with the provided config.
-  explicit Uart(const UartConfig& config);
+  // Configuration for one uart peripheral.
+  struct Config {
+    pins::Uart uart;
+    pins::Pin tx;
+    pins::Pin rx;
+    uint32_t baud_rate;
+  };
 
-  // Blocks until every byte has been accepted by the transmitter.
+  // Configures Uart with the provided config.
+  explicit Uart(const Config& config);
 
   // Writes the buffer to the UART transmitter, blocking until the write has
   // completed.
@@ -59,7 +31,8 @@ class Uart {
   void Write(const char* text);
 
  private:
-  USART_TypeDef* usart_;
+  // Type erased usart handle.
+  void* handle_;
 };
 
 }  // namespace fw::platform

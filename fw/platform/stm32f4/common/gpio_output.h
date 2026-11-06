@@ -8,7 +8,7 @@ namespace fw::platform {
 // A GPIO pin configured as a push-pull output, initially low.
 class GpioOutput : public GpioOutputInterface {
  public:
-  explicit GpioOutput(Pin pin);
+  explicit GpioOutput(pins::Pin pin);
 
   // Drives the pin high when `high`, otherwise low.
   void Set(bool high);
@@ -18,7 +18,7 @@ class GpioOutput : public GpioOutputInterface {
 
  private:
   // The GPIO port for this output pin.
-  const Port port_;
+  const pins::Port port_;
 
   // The pin for this output pin.
   const uint8_t pin_;
