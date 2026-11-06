@@ -2,8 +2,8 @@
 
 // Board configuration for the Nucleo-F446RE.
 
-#include "fw/platform/stm32f4/common/uart.h"
 #include "fw/platform/stm32f4/common/pin_map.h"
+#include "fw/platform/stm32f4/common/uart.h"
 
 namespace fw::board {
 
