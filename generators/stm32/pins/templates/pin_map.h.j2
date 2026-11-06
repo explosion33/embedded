@@ -33,6 +33,7 @@ constexpr Port GetPort(Pin pin) {
             case Pin::{{ pin.enum_name }}: return Port::{{ pin.port_enum }};
         {% endfor %}
     }
+    __builtin_unreachable();
 }
 
 // Returns the pin index for the provided `pin`, or nullopt if the pin is not valid.
@@ -42,6 +43,7 @@ constexpr uint8_t GetPinIndex(Pin pin) {
             case Pin::{{ pin.enum_name }}: return {{ pin.pin_idx }};
         {% endfor %}
     }
+    __builtin_unreachable();
 }
 
 // Returns the alternate function mapping to the provided uart for a TX pin.
