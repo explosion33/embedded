@@ -68,6 +68,18 @@ cc_test(
 )
 
 cc_test(
+    name = "host_mutex_test",
+    srcs = ["host/mutex_test.cc"],
+    deps = [
+        ":mutex",
+        ":thread",
+        ":time",
+        "//fw/log",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "host_semaphore_test",
     srcs = ["host/semaphore_test.cc"],
     deps = [
@@ -81,14 +93,20 @@ cc_test(
 
 cc_library(
     name = "mutex",
-    srcs = ["mutex.cc"],
+    srcs = select({
+        _FREERTOS: ["mutex.cc"],
+        "//conditions:default": ["host/mutex.cc"],
+    }),
     hdrs = ["mutex.h"],
-    target_compatible_with = ["@platforms//os:none"],
     deps = [
-        ":main",  # Link main so os apps can't redifine main.
         "//fw/log:check",
-        "@freertos_kernel//:freertos",
-    ],
+    ] + select({
+        _FREERTOS: [
+            ":main",  # Link main so os apps can't redifine main.
+            "@freertos_kernel//:freertos",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(
