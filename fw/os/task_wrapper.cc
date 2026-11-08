@@ -33,6 +33,8 @@ Task::Task(const Config& task) {
   CHECK(handle_ != nullptr);
 }
 
+Task::~Task() {}
+
 void Task::Pause() {
   CHECK(!paused_);
   CHECK(handle_ != nullptr);
