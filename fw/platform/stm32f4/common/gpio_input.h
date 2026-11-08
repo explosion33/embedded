@@ -11,6 +11,7 @@ class GpioInput : public GpioInputInterface {
   explicit GpioInput(pins::Pin pin);
 
   bool Read() const override;
+  void SetPull(Pull pull) override;
 
  private:
   // The GPIO port for this input pin.
