@@ -26,3 +26,12 @@ cc_fw_test(
         "//fw/testing:test",
     ],
 )
+
+cc_fw_test(
+    name = "os_test",
+    board = "//fw/boards/nucleo_f446re",
+    target = "STM32F4",
+    deps = [
+        "//fw/os:os_test_lib",
+    ],
+)

@@ -151,11 +151,11 @@ cc_library(
     alwayslink = True,
 )
 
-cc_fw_test(
-    name = "os_test",
+# os test is board dependant so we expose the test here and define alongside
+# board tests.
+cc_library(
+    name = "os_test_lib",
     srcs = ["os_test.cc"],
-    board = "//fw/boards/nucleo_f446re",
-    target = "STM32F4",
     deps = [
         ":mutex",
         ":semaphore",
@@ -164,4 +164,5 @@ cc_fw_test(
         "//fw/platform/stm32f4/common:freertos",
         "//fw/testing:test",
     ],
+    alwayslink = True,
 )

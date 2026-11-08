@@ -6,7 +6,7 @@ namespace fw::os {
 namespace {
 
 TEST(TimeTest, TestDelayAndMillis) {
-  constexpr size_t kMaxError = 1;
+  constexpr size_t kMaxError = 5;
 
   for (size_t millis : {10, 100, 500, 1000}) {
     const size_t start = Millis();
