@@ -34,15 +34,15 @@ TEST(PinMapStm32Data, Usart3) {
   EXPECT_EQ(GetUartTxAf(Uart::kUSART3, Pin::kPC11), std::nullopt);
 
   EXPECT_EQ(GetUartRxAf(Uart::kUSART3, Pin::kPC11), 7);
-  EXPECT_EQ(GetUartRxAf(Uart::kUSART3, Pin::kPC10), std::nullopt);
+  EXPECT_EQ(GetUartRxAf(Uart::kUSART3, Pin::kPC12), std::nullopt);
 }
 
 TEST(PinMapStm32Data, Uart4) {
   EXPECT_EQ(GetUartTxAf(Uart::kUART4, Pin::kPC10), 8);
   EXPECT_EQ(GetUartTxAf(Uart::kUART4, Pin::kPC11), std::nullopt);
 
-  EXPECT_EQ(GetUartRxAf(Uart::kUART4, Pin::kPC11), 8);
-  EXPECT_EQ(GetUartRxAf(Uart::kUART4, Pin::kPC10), std::nullopt);
+  EXPECT_EQ(GetUartRxAf(Uart::kUART4, Pin::kPC12), 8);
+  EXPECT_EQ(GetUartRxAf(Uart::kUART4, Pin::kPC11), std::nullopt);
 }
 
 }  // namespace
