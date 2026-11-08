@@ -38,5 +38,37 @@ TEST_F(PinLockTest, RemoveBeforeAdd) {
   EXPECT_DEATH(PinLock<Pin>::RemovePin(Pin::k2);, ".*");
 }
 
+TEST_F(PinLockTest, RAIISingle) {
+  {
+    PinLock<Pin>::Lock _(Pin::k0);
+
+    // Only pin 0 should be locked.
+    EXPECT_DEATH(PinLock<Pin>::AddPin(Pin::k0), ".*");
+    PinLock<Pin>::AddPin(Pin::k1);
+    PinLock<Pin>::AddPin(Pin::k2);
+  }
+
+  // With the lock dropped, only pin 0 should be released.
+  EXPECT_DEATH(PinLock<Pin>::RemovePin(Pin::k0), ".*");
+  PinLock<Pin>::RemovePin(Pin::k1);
+  PinLock<Pin>::RemovePin(Pin::k2);
+}
+
+TEST_F(PinLockTest, RAIIMultiple) {
+  {
+    PinLock<Pin>::Lock _({Pin::k0, Pin::k2});
+
+    // Only pin 0 and 2 should be locked.
+    EXPECT_DEATH(PinLock<Pin>::AddPin(Pin::k0), ".*");
+    EXPECT_DEATH(PinLock<Pin>::AddPin(Pin::k2), ".*");
+    PinLock<Pin>::AddPin(Pin::k1);
+  }
+
+  // With the lock dropped, only pin 0 and 2 should be released.
+  EXPECT_DEATH(PinLock<Pin>::RemovePin(Pin::k0), ".*");
+  EXPECT_DEATH(PinLock<Pin>::RemovePin(Pin::k2), ".*");
+  PinLock<Pin>::RemovePin(Pin::k1);
+}
+
 }  // namespace
 }  // namespace fw::platform

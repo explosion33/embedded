@@ -4,7 +4,9 @@
 #include <atomic>
 #include <climits>
 #include <cstdint>
+#include <initializer_list>
 #include <utility>
+#include <vector>
 
 #include "fw/log/check.h"
 
@@ -22,12 +24,33 @@ namespace fw::platform {
 template <typename PinEnum>
 class PinLock {
  public:
+  // RAII Lock wrapper around the PinLock.
+  class Lock {
+   public:
+    Lock(PinEnum pin) : Lock({pin}) {};
+    Lock(std::initializer_list<PinEnum> pins) {
+      pins_.reserve(pins.size());
+      for (PinEnum pin : pins) {
+        AddPin(pin);
+        pins_.push_back(pin);
+      }
+    }
+    ~Lock() {
+      for (PinEnum pin : pins_) {
+        RemovePin(pin);
+      }
+    }
+
+   private:
+    // The pins this lock holds.
+    std::vector<PinEnum> pins_;
+  };
+
   PinLock(const PinLock&) = delete;
   PinLock& operator=(const PinLock&) = delete;
 
   // Adds the pin to the pin lock. Erroring if its in use.
   static void AddPin(PinEnum pin) {
-    PinLock& lock = PinLock::GetPinLock();
     const auto idx = std::to_underlying(pin);
     // TODO: Repalce with GenerateBitMask utility.
     const uint32_t mask = 1u << (idx % kU32Bits);
