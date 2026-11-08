@@ -1,4 +1,5 @@
 load("//fw/platform/bazel:firmware.bzl", "cc_fw_app")
+load("//fw/testing/bazel:firmware.bzl", "cc_fw_test")
 
 cc_fw_app(
     name = "rtos_demo",
@@ -10,5 +11,18 @@ cc_fw_app(
         "//fw/os:time",
         "//fw/platform/stm32f4/common:freertos",
         "//fw/platform/stm32f4/common:gpio_output",
+    ],
+)
+
+cc_fw_test(
+    name = "peripheral_test",
+    srcs = ["peripheral_test.cc"],
+    board = "//fw/boards/nucleo_f446re",
+    target = "STM32F4",
+    deps = [
+        "//fw/platform/stm32f4/common:freertos",
+        "//fw/platform/stm32f4/common:gpio_input",
+        "//fw/platform/stm32f4/common:gpio_output",
+        "//fw/testing:test",
     ],
 )
