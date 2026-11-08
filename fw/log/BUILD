@@ -54,11 +54,11 @@ cc_library(
 
 label_flag(
     name = "backend",
-    build_setting_default = ":no_backend",
+    build_setting_default = ":host_backend",
 )
 
-# TODO: This can probably be defaulted to a host backend using std::cout.
 cc_library(
-    name = "no_backend",
-    target_compatible_with = ["@platforms//:incompatible"],
+    name = "host_backend",
+    srcs = ["host_backend.cc"],
+    deps = [":headers"],
 )
