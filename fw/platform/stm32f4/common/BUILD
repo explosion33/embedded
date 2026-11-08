@@ -64,6 +64,7 @@ cc_library(
     deps = [
         ":pin_map",
         "//fw/log:check",
+        "//fw/platform/common:pin_lock",
     ],
 )
 
@@ -112,6 +113,7 @@ cc_library(
         ":pin_map",
         "//fw/log:check",
         "//fw/platform/common:gpio_output_interface",
+        "//fw/platform/common:pin_lock",
     ],
 )
 
@@ -128,6 +130,7 @@ cc_library(
     deps = [
         ":pin_map",
         "//fw/platform/common:gpio_input_interface",
+        "//fw/platform/common:pin_lock",
     ],
 )
 

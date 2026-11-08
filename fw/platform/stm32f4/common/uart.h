@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "fw/platform/common/pin_lock.h"
 #include "fw/platform/stm32f4/common/pin_map.h"
 
 namespace fw::platform {
@@ -33,6 +34,9 @@ class Uart {
  private:
   // Type erased usart handle.
   void* handle_;
+
+  // The pin lock for this UARTs pins.
+  PinLock<pins::Pin>::Lock lock_;
 };
 
 }  // namespace fw::platform
