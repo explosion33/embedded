@@ -32,6 +32,10 @@ TEST_F(PinLockTest, DoubleAdd) {
 
 TEST_F(PinLockTest, RemoveBeforeAdd) {
   EXPECT_DEATH(PinLock<Pin>::RemovePin(Pin::k1);, ".*");
+
+  PinLock<Pin>::AddPin(Pin::k2);
+  PinLock<Pin>::RemovePin(Pin::k2);
+  EXPECT_DEATH(PinLock<Pin>::RemovePin(Pin::k2);, ".*");
 }
 
 }  // namespace

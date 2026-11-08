@@ -40,7 +40,7 @@ class PinLock {
     const auto idx = std::to_underlying(pin);
     // TODO: Repalce with GenerateBitMask utility.
     const uint32_t mask = 1u << (idx % kU32Bits);
-    const uint32_t prev = GetPinLock().pins_[idx / kU32Bits].fetch_or(~mask);
+    const uint32_t prev = GetPinLock().pins_[idx / kU32Bits].fetch_and(~mask);
     CHECK(prev & mask) << idx;
   }
 
