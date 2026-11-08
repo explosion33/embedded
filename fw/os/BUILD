@@ -9,13 +9,14 @@ _FREERTOS = "@platforms//os:none"
 cc_library(
     name = "thread",
     hdrs = ["thread.h"],
-    target_compatible_with = ["@platforms//os:none"],
     deps = [
-        ":main",  # Link main so os apps can't redifine main.
         ":semaphore",
         ":task_wrapper",
         "//fw/log:check",
-    ],
+    ] + select({
+        _FREERTOS: [":main"],  # Link main so os apps can't redifine main.
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(
@@ -55,6 +56,29 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "host_thread_test",
+    srcs = ["host/thread_test.cc"],
+    deps = [
+        ":thread",
+        ":time",
+        "//fw/log",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "host_semaphore_test",
+    srcs = ["host/semaphore_test.cc"],
+    deps = [
+        ":semaphore",
+        ":thread",
+        ":time",
+        "//fw/log",
+        "@googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "mutex",
     srcs = ["mutex.cc"],
@@ -69,14 +93,18 @@ cc_library(
 
 cc_library(
     name = "semaphore",
-    srcs = ["semaphore.cc"],
+    srcs = select({
+        _FREERTOS: ["semaphore.cc"],
+        "//conditions:default": ["host/semaphore.cc"],
+    }),
     hdrs = ["semaphore.h"],
-    target_compatible_with = ["@platforms//os:none"],
-    deps = [
-        ":main",  # Link main so os apps can't redifine main.
-        "//fw/log:check",
-        "@freertos_kernel//:freertos",
-    ],
+    deps = ["//fw/log:check"] + select({
+        _FREERTOS: [
+            ":main",  # Link main so os apps can't redifine main.
+            "@freertos_kernel//:freertos",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(
