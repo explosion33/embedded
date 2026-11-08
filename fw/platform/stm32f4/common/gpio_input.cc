@@ -10,7 +10,7 @@
 namespace fw::platform {
 
 GpioInput::GpioInput(pins::Pin pin)
-    : port_(GetPort(pin)), pin_(GetPinIndex(pin)) {
+    : port_(GetPort(pin)), pin_(GetPinIndex(pin)), lock_(pin) {
   const auto ll_port = internal::GetLLPort(port_);
   const auto ll_pin = internal::GetLLPin(pin_);
 

@@ -11,7 +11,7 @@
 
 namespace fw::platform {
 
-Uart::Uart(const Config& config) {
+Uart::Uart(const Config& config) : lock_({config.tx, config.rx}) {
   USART_TypeDef* usart = internal::GetLLUsart(config.uart);
   handle_ = usart;
 
