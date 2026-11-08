@@ -1,7 +1,10 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("//fw/testing/bazel:firmware.bzl", "cc_fw_test")
 
 package(default_visibility = ["//fw:__subpackages__"])
+
+_FREERTOS = "@platforms//os:none"
 
 cc_library(
     name = "thread",
@@ -17,13 +20,27 @@ cc_library(
 
 cc_library(
     name = "time",
-    srcs = ["time.cc"],
+    srcs = select({
+        _FREERTOS: ["time.cc"],
+        "//conditions:default": ["host/time.cc"],
+    }),
     hdrs = ["time.h"],
-    target_compatible_with = ["@platforms//os:none"],
+    deps = select({
+        _FREERTOS: [
+            ":main",  # Link main so os apps can't redifine main.
+            "//fw/log:check",
+            "@freertos_kernel//:freertos",
+        ],
+        "//conditions:default": [],
+    }),
+)
+
+cc_test(
+    name = "host_time_test",
+    srcs = ["host/time_test.cc"],
     deps = [
-        ":main",  # Link main so os apps can't redifine main.
-        "//fw/log:check",
-        "@freertos_kernel//:freertos",
+        ":time",
+        "@googletest//:gtest_main",
     ],
 )
 
