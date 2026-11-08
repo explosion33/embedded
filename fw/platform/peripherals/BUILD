@@ -6,3 +6,8 @@ cc_library(
     name = "gpio_output_interface",
     hdrs = ["gpio_output_interface.h"],
 )
+
+cc_library(
+    name = "gpio_input_interface",
+    hdrs = ["gpio_input_interface.h"],
+)

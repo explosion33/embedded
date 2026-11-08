@@ -116,6 +116,22 @@ cc_library(
 )
 
 cc_library(
+    name = "gpio_input",
+    srcs = ["gpio_input.cc"],
+    hdrs = ["gpio_input.h"],
+    implementation_deps = [
+        ":ll",
+        ":ll_helpers",
+    ],
+    target_compatible_with = TARGET_COMPATIBLE_WITH,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":pin_map",
+        "//fw/platform/peripherals:gpio_input_interface",
+    ],
+)
+
+cc_library(
     name = "freertos_config_stm32f4",
     hdrs = ["freertos/stm32f4_freertos_config.h"],
     target_compatible_with = TARGET_COMPATIBLE_WITH,
