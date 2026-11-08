@@ -2,6 +2,8 @@
 
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
+#include <mutex>
 #include <semaphore>
 
 #include "fw/log/check.h"
@@ -14,9 +16,10 @@ constexpr size_t kMaxCount = 1000;
 
 // The state tracked by this implementation. Stored in `handle_`.
 struct State {
-  std::counting_semaphore<kMaxCount> sem{0};
-  std::atomic<size_t> count{0};
-  size_t max_count;
+  std::mutex mtx;
+  std::condition_variable cv;
+  size_t count = 0;
+  const size_t max_count;
 };
 
 }  // namespace
@@ -33,38 +36,39 @@ Semaphore::~Semaphore() { delete static_cast<State*>(handle_); }
 bool Semaphore::Give() {
   State* state = static_cast<State*>(handle_);
 
-  // Atomically increment the current count without exceeding the self-tracked
-  // max_count.
-  size_t curr = state->count.load();
-  size_t incremented;
-  do {
-    if (curr >= state->max_count) {
+  {
+    std::lock_guard lock(state->mtx);
+
+    if (state->count == state->max_count) {
       return false;
     }
-    incremented = curr + 1;
-  } while (!state->count.compare_exchange_weak(curr, incremented));
-  state->sem.release();
+    state->count++;
+  }
+  state->cv.notify_one();
   return true;
 }
 
 void Semaphore::Take() {
   State* state = static_cast<State*>(handle_);
-  state->sem.acquire();
-  state->count.fetch_add(-1);
+  std::unique_lock lock(state->mtx);
+  state->cv.wait(lock, [state] { return state->count > 0; });
+  state->count--;
 }
 
 bool Semaphore::TryTakeFor(size_t millis) {
   State* state = static_cast<State*>(handle_);
-  bool res = state->sem.try_acquire_for(std::chrono::milliseconds(millis));
-  if (res) {
-    state->count.fetch_add(-1);
+  std::unique_lock lock(state->mtx);
+  if (!state->cv.wait_for(lock, std::chrono::milliseconds(millis),
+                          [state] { return state->count > 0; })) {
+    return false;
   }
-  return res;
+  state->count--;
+  return true;
 }
 
 size_t Semaphore::Count() {
   State* state = static_cast<State*>(handle_);
-  return state->count.load();
+  return state->count;
 }
 
 }  // namespace fw::os
