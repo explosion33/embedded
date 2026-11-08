@@ -23,6 +23,7 @@ class Task {
   Task& operator=(const Task&) = delete;
 
   explicit Task(const Config& task);
+  ~Task();
 
   // Pauses the tasks execution.
   void Pause();

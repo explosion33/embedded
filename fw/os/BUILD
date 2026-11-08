@@ -44,6 +44,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "host_task_wrapper_test",
+    srcs = ["host/task_wrapper_test.cc"],
+    deps = [
+        ":task_wrapper",
+        ":time",
+        "//fw/log",
+        "@googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "mutex",
     srcs = ["mutex.cc"],
@@ -70,13 +81,17 @@ cc_library(
 
 cc_library(
     name = "task_wrapper",
-    srcs = ["task_wrapper.cc"],
+    srcs = select({
+        _FREERTOS: ["task_wrapper.cc"],
+        "//conditions:default": ["host/task_wrapper.cc"],
+    }),
     hdrs = ["task_wrapper.h"],
-    target_compatible_with = ["@platforms//os:none"],
     deps = [
         "//fw/log:check",
-        "@freertos_kernel//:freertos",
-    ],
+    ] + select({
+        _FREERTOS: ["@freertos_kernel//:freertos"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(
