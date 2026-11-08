@@ -35,7 +35,7 @@
               "af": 8
             },
             {
-              "pin": "PC11",
+              "pin": "PC12",
               "signal": "RX",
               "af": 8
             }

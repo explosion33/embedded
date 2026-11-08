@@ -26,7 +26,7 @@ enum class Uart : uint8_t {
 {% endfor %}
 };
 
-// Returns the port for the provided `pin`, or nullopt if the pin is not valid.
+// Returns the port for the provided `pin`.
 constexpr Port GetPort(Pin pin) {
     switch (pin) {
         {% for pin in pins %}
@@ -36,7 +36,7 @@ constexpr Port GetPort(Pin pin) {
     __builtin_unreachable();
 }
 
-// Returns the pin index for the provided `pin`, or nullopt if the pin is not valid.
+// Returns the pin index for the provided `pin`.
 constexpr uint8_t GetPinIndex(Pin pin) {
     switch (pin) {
         {% for pin in pins %}
@@ -55,11 +55,14 @@ constexpr std::optional<uint8_t> GetUartTxAf(Uart uart, Pin pin) {
                 {% for pin in uart.tx_pins %}
                 case Pin::{{ pin.enum_name }}: return {{ pin.enum_value }};
                 {% endfor %}
+                default:
+                    return std::nullopt;
             }
         }
         {% endfor %}
     }
-    return std::nullopt;
+    __builtin_unreachable();
+    
 }
 
 
@@ -72,10 +75,12 @@ constexpr std::optional<uint8_t> GetUartRxAf(Uart uart, Pin pin) {
                 {% for pin in uart.rx_pins %}
                 case Pin::{{ pin.enum_name }}: return {{ pin.enum_value }};
                 {% endfor %}
+                default:
+                    return std::nullopt;
             }
         }
         {% endfor %}
     }
-    return std::nullopt;
+     __builtin_unreachable();
 }
 } // {{ namespace }}
