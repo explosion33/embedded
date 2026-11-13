@@ -9,10 +9,9 @@ namespace fw::platform::internal {
 
 // Get the LL Port def pointer for this port.
 inline GPIO_TypeDef* GetLLPort(pins::Port port) {
-  GPIO_TypeDef* base = GPIOA;
-  const size_t stride = GPIOB - GPIOA;
-
-  return static_cast<GPIO_TypeDef*>(static_cast<size_t>(port) * stride + base);
+  constexpr uintptr_t kStride = GPIOB_BASE - GPIOA_BASE;
+  return reinterpret_cast<GPIO_TypeDef*>(
+      GPIOA_BASE + static_cast<uintptr_t>(port) * kStride);
 }
 
 // Gets the LL port clock mask for the provided port.

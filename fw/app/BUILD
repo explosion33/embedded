@@ -20,9 +20,11 @@ cc_fw_test(
     board = "//fw/boards/nucleo_f446re",
     target = "STM32F4",
     deps = [
+        "//fw/os:time",
         "//fw/platform/stm32f4/common:freertos",
         "//fw/platform/stm32f4/common:gpio_input",
         "//fw/platform/stm32f4/common:gpio_output",
+        "//fw/platform/stm32f4/common:interrupts",
         "//fw/testing:test",
     ],
 )

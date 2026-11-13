@@ -178,3 +178,14 @@ cc_library(
         "@freertos_kernel//:freertos",
     ],
 )
+
+cc_library(
+    name = "constants",
+    srcs = ["constants.cc"],
+    hdrs = ["constants.h"],
+    target_compatible_with = ["@platforms//os:none"],
+    deps = [
+        ":main",  # Link main so os apps can't redifine main.
+        "@freertos_kernel//:freertos",
+    ],
+)
