@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include "fw/log/check.h"
+#include "fw/os/critical.h"
 #include "fw/os/mutex.h"
 #include "fw/os/semaphore.h"
 #include "fw/os/thread.h"
@@ -282,6 +283,39 @@ TEST(ThreadNotify) {
   t.Notify(false);
   Delay(10);
   EXPECT_TRUE(ran);
+}
+
+TEST(CriticalSectionStopsRtosSwitch) {
+  // Run the test twice, once using critical sections and once without,
+  // expecting opposite results.
+  {
+    Thread t;
+    bool ran = false;
+    t.Start([&ran]() { ran = true; });
+    {
+      // Busy Loop, since Delay within a critical section is undefined.
+      for (volatile size_t i = 0; i < 1000000;) {
+        i = i + 1;
+      }
+      EXPECT_TRUE(ran);
+    }
+  }
+
+  {
+    Thread t;
+    bool ran = false;
+    t.Start([&ran]() { ran = true; });
+    {
+      CriticalSection _;
+      // Busy Loop, since Delay within a critical section is undefined.
+      for (volatile size_t i = 0; i < 1000000;) {
+        i = i + 1;
+      }
+      EXPECT_FALSE(ran);
+    }
+    Delay(10);
+    EXPECT_TRUE(ran);
+  }
 }
 
 }  // namespace

@@ -157,6 +157,7 @@ cc_library(
     name = "os_test_lib",
     srcs = ["os_test.cc"],
     deps = [
+        ":critical",
         ":mutex",
         ":semaphore",
         ":thread",
@@ -165,4 +166,15 @@ cc_library(
         "//fw/testing:test",
     ],
     alwayslink = True,
+)
+
+cc_library(
+    name = "critical",
+    srcs = ["critical.cc"],
+    hdrs = ["critical.h"],
+    target_compatible_with = ["@platforms//os:none"],
+    deps = [
+        ":main",  # Link main so os apps can't redifine main.
+        "@freertos_kernel//:freertos",
+    ],
 )
