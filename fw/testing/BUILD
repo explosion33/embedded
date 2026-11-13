@@ -38,7 +38,6 @@ cc_library(
     srcs = ["pass_test.cc"],
     deps = [
         "//fw/os:main",
-        "//fw/platform/stm32f4/common:freertos",
         "//fw/testing:test",
     ],
     alwayslink = True,
@@ -49,7 +48,6 @@ cc_library(
     srcs = ["fail_test.cc"],
     deps = [
         "//fw/os:main",
-        "//fw/platform/stm32f4/common:freertos",
         "//fw/testing:test",
     ],
     alwayslink = True,
