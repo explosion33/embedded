@@ -286,20 +286,36 @@ TEST(ThreadNotify) {
 }
 
 TEST(CriticalSectionStopsRtosSwitch) {
-  Thread t;
-  bool ran = false;
-
-  t.Start([&ran]() { ran = true; });
+  // Run the test twice, once using critical sections and once without,
+  // expecting opposite results.
   {
-    CriticalSection _;
-    // Busy Loop, since Delay within a critical section is undefined.
-    for (volatile size_t i = 0; i < 1000000;) {
-      i = i + 1;
+    Thread t;
+    bool ran = false;
+    t.Start([&ran]() { ran = true; });
+    {
+      // Busy Loop, since Delay within a critical section is undefined.
+      for (volatile size_t i = 0; i < 1000000;) {
+        i = i + 1;
+      }
+      EXPECT_TRUE(ran);
     }
-    EXPECT_FALSE(ran);
   }
-  Delay(10);
-  EXPECT_TRUE(ran);
+
+  {
+    Thread t;
+    bool ran = false;
+    t.Start([&ran]() { ran = true; });
+    {
+      CriticalSection _;
+      // Busy Loop, since Delay within a critical section is undefined.
+      for (volatile size_t i = 0; i < 1000000;) {
+        i = i + 1;
+      }
+      EXPECT_FALSE(ran);
+    }
+    Delay(10);
+    EXPECT_TRUE(ran);
+  }
 }
 
 }  // namespace
