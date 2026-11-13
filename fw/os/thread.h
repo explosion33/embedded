@@ -62,6 +62,17 @@ class Thread {
     }
   }
 
+  // Called from within a thread, waits for a notification on this thread.
+  static void WaitForNotification() { internal::Task::WaitForNotify(); }
+
+  // Notifies this thread to continue execution. Must be currently under
+  // `WaitForNotification`.
+  void Notify(bool from_isr) {
+    TryClearTask();
+    CHECK(task_.has_value());
+    task_->Notify(from_isr);
+  }
+
   // Runs the provided function in the thread with the provided arguments.
   template <typename Fn, typename... Args>
   void Start(Fn fn, Args... args) {

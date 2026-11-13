@@ -66,4 +66,16 @@ size_t Task::GetMinimalStackSize() {
   return configMINIMAL_STACK_SIZE * sizeof(StackType_t);
 }
 
+void Task::WaitForNotify() { ulTaskNotifyTake(pdTRUE, portMAX_DELAY); }
+
+void Task::Notify(bool from_isr) {
+  TaskHandle_t handle = static_cast<TaskHandle_t>(handle_);
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+  vTaskNotifyGiveFromISR(handle, &xHigherPriorityTaskWoken);
+  if (from_isr) {
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+  }
+}
+
 }  // namespace fw::os::internal
