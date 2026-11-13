@@ -1,6 +1,5 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_python//python:py_binary.bzl", "py_binary")
-load("//fw/testing/bazel:firmware.bzl", "cc_fw_test")
 
 package(default_visibility = ["//fw:__subpackages__"])
 
@@ -34,29 +33,26 @@ cc_library(
     ],
 )
 
-cc_fw_test(
-    name = "pass_test",
+cc_library(
+    name = "pass_test_lib",
     srcs = ["pass_test.cc"],
-    board = "//fw/boards/nucleo_f446re",
-    target = "stm32f446re",
     deps = [
         "//fw/os:main",
         "//fw/platform/stm32f4/common:freertos",
         "//fw/testing:test",
     ],
+    alwayslink = True,
 )
 
-cc_fw_test(
-    name = "fail_test",
+cc_library(
+    name = "fail_test_lib",
     srcs = ["fail_test.cc"],
-    board = "//fw/boards/nucleo_f446re",
-    negative = True,
-    target = "stm32f446re",
     deps = [
         "//fw/os:main",
         "//fw/platform/stm32f4/common:freertos",
         "//fw/testing:test",
     ],
+    alwayslink = True,
 )
 
 py_binary(
