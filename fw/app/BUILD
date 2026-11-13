@@ -18,7 +18,7 @@ cc_fw_test(
     name = "peripheral_test",
     srcs = ["peripheral_test.cc"],
     board = "//fw/boards/nucleo_f446re",
-    target = "STM32F4",
+    target = "stm32f446re",
     deps = [
         "//fw/os:thread",
         "//fw/os:time",
@@ -33,7 +33,7 @@ cc_fw_test(
 cc_fw_test(
     name = "os_test",
     board = "//fw/boards/nucleo_f446re",
-    target = "STM32F4",
+    target = "stm32f446re",
     deps = [
         "//fw/os:os_test_lib",
     ],
