@@ -72,9 +72,11 @@ void Task::Notify(bool from_isr) {
   TaskHandle_t handle = static_cast<TaskHandle_t>(handle_);
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-  vTaskNotifyGiveFromISR(handle, &xHigherPriorityTaskWoken);
   if (from_isr) {
+    vTaskNotifyGiveFromISR(handle, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+  } else {
+    xTaskNotifyGive(handle);
   }
 }
 
