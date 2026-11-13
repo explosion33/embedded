@@ -1,7 +1,5 @@
 #include <cstdio>
-#include <string_view>
 
-#include "fw/boards/nucleo_f446re/board.h"
 #include "fw/log/stream.h"
 #include "fw/testing/test.h"
 
