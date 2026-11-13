@@ -1,5 +1,8 @@
 #include <cstdio>
 
+#include "fw/os/mutex.h"
+#include "fw/os/task_wrapper.h"
+#include "fw/os/thread.h"
 #include "fw/os/time.h"
 #include "fw/platform/stm32f4/common/gpio_input.h"
 #include "fw/platform/stm32f4/common/gpio_output.h"
@@ -203,6 +206,32 @@ TEST(MultiInterruptMultiLine) {
   EXPECT_EQ(calls_1, 2);
 
   interrupts.RemoveGpioIrq(kPin1);
+}
+
+TEST(FreeRTOSInterrupt) {
+  constexpr Pin kPin = Pin::kPH1;
+
+  GpioOutput output(kPin);
+  output.Set(false);
+
+  Interrupts& interrupts = Interrupts::Get();
+
+  fw::os::Thread t;
+  size_t calls = 0;
+  t.Start([&calls]() {
+    fw::os::Thread::WaitForNotification();
+
+    // Locking a mutex is not possible in an ISR context.
+    fw::os::Mutex mtx;
+    mtx.Lock();
+    calls++;
+  });
+
+  interrupts.AddGpioIrq(kPin, Interrupts::Edge::kBoth,
+                        [&t]() { t.Notify(/*from_isr=*/true); });
+  output.Toggle();
+  t.Join();
+  EXPECT_EQ(calls, 1);
 }
 
 }  // namespace

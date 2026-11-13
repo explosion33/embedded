@@ -68,7 +68,9 @@ class Thread {
   // Notifies this thread to continue execution. Must be currently under
   // `WaitForNotification`.
   void Notify(bool from_isr) {
-    TryClearTask();
+    if (!from_isr) {
+      TryClearTask();
+    }
     CHECK(task_.has_value());
     task_->Notify(from_isr);
   }
