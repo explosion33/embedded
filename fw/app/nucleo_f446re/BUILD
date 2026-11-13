@@ -16,17 +16,10 @@ cc_fw_app(
 
 cc_fw_test(
     name = "peripheral_test",
-    srcs = ["peripheral_test.cc"],
     board = "//fw/boards/nucleo_f446re",
     target = "stm32f446re",
     deps = [
-        "//fw/os:thread",
-        "//fw/os:time",
-        "//fw/platform/stm32f4/common:freertos",
-        "//fw/platform/stm32f4/common:gpio_input",
-        "//fw/platform/stm32f4/common:gpio_output",
-        "//fw/platform/stm32f4/common:interrupts",
-        "//fw/testing:test",
+        "//fw/app/stm32f4:peripheral_test_lib",
     ],
 )
 
