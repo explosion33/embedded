@@ -52,4 +52,8 @@ size_t Task::GetMinimalStackSize() {
   return 128;
 }
 
+void Task::WaitForNotify() { CHECK(false) << "Not supported on host."; }
+
+void Task::Notify(bool) { CHECK(false) << "Not supported on host."; }
+
 }  // namespace fw::os::internal

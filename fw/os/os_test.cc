@@ -266,5 +266,23 @@ TEST(ThreadPause) {
   thread.Join();
 }
 
+TEST(ThreadNotify) {
+  Thread t;
+
+  bool ran = false;
+  t.Start([&ran]() {
+    Thread::WaitForNotification();
+    ran = true;
+  });
+  EXPECT_FALSE(ran);
+
+  Delay(100);
+  EXPECT_FALSE(ran);
+
+  t.Notify(false);
+  Delay(10);
+  EXPECT_TRUE(ran);
+}
+
 }  // namespace
 }  // namespace fw::os
