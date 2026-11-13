@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include "fw/log/check.h"
+#include "fw/os/critical.h"
 #include "fw/os/mutex.h"
 #include "fw/os/semaphore.h"
 #include "fw/os/thread.h"
@@ -280,6 +281,23 @@ TEST(ThreadNotify) {
   EXPECT_FALSE(ran);
 
   t.Notify(false);
+  Delay(10);
+  EXPECT_TRUE(ran);
+}
+
+TEST(CriticalSectionStopsRtosSwitch) {
+  Thread t;
+  bool ran = false;
+
+  t.Start([&ran]() { ran = true; });
+  {
+    CriticalSection _;
+    // Busy Loop, since Delay within a critical section is undefined.
+    for (volatile size_t i = 0; i < 1000000;) {
+      i = i + 1;
+    }
+    EXPECT_FALSE(ran);
+  }
   Delay(10);
   EXPECT_TRUE(ran);
 }
