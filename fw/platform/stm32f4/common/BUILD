@@ -155,3 +155,22 @@ cc_library(
     ],
     alwayslink = True,
 )
+
+cc_library(
+    name = "interrupts",
+    srcs = ["interrupts.cc"],
+    hdrs = ["interrupts.h"],
+    implementation_deps = [
+        ":ll",
+        "//fw/log",
+        "//fw/log:check",
+        "//fw/os:constants",
+        "//fw/os:critical",
+    ],
+    target_compatible_with = TARGET_COMPATIBLE_WITH,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":pin_map",
+        "//fw/os:mutex",
+    ],
+)
