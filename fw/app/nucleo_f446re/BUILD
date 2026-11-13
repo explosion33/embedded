@@ -29,6 +29,7 @@ cc_fw_test(
     target = "stm32f446re",
     deps = [
         "//fw/os:os_test_lib",
+        "//fw/platform/stm32f4/common:freertos",
     ],
 )
 
@@ -37,6 +38,7 @@ cc_fw_test(
     board = "//fw/boards/nucleo_f446re",
     target = "stm32f446re",
     deps = [
+        "//fw/platform/stm32f4/common:freertos",
         "//fw/testing:pass_test_lib",
     ],
 )
@@ -47,6 +49,7 @@ cc_fw_test(
     negative = True,
     target = "stm32f446re",
     deps = [
+        "//fw/platform/stm32f4/common:freertos",
         "//fw/testing:fail_test_lib",
     ],
 )
