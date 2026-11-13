@@ -20,3 +20,13 @@ config_setting(
     name = "is_stm32f446",
     constraint_values = [":stm32f446"],
 )
+
+constraint_value(
+    name = "stm32f411",
+    constraint_setting = ":mcu",
+)
+
+config_setting(
+    name = "is_stm32f411",
+    constraint_values = [":stm32f411"],
+)
