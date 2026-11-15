@@ -1,10 +1,9 @@
 load("@rules_python//python:py_test.bzl", "py_test")
 load("//fw/platform/bazel:firmware.bzl", "cc_fw_app")
 
-# TODO: `target` could probably be derived from `board` if we do:
-#   * Convert flash script to scan board names rather than target
-#     names
-#   * Define a list of compatible targets for a given board.
+# TODO: For multiple probes on the same host we need to provide a way to
+# provide the correct uid. This probably involves some always on probe
+# manager with per-host persistant target -> uid storage.
 def cc_fw_test(
         name,
         board,

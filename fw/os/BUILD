@@ -1,6 +1,5 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
-load("//fw/testing/bazel:firmware.bzl", "cc_fw_test")
 
 package(default_visibility = ["//fw:__subpackages__"])
 

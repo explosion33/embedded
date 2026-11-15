@@ -97,7 +97,7 @@ def main(binary_rlocation: str, target: str, negative: bool):
 
     with serial.Serial("/dev/ttyACM0", 115200, timeout=1) as ser:
         with terminal_color(TerminalColor.GREY):
-            flash.flash_from(pathlib.Path(binary_path), target)
+            flash.flash_from(pathlib.Path(binary_path), target, None)
 
         test_names = []
         test_statuses = []

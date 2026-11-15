@@ -38,7 +38,7 @@ cc_fw_test(
     name = "pass_test",
     srcs = ["pass_test.cc"],
     board = "//fw/boards/nucleo_f446re",
-    target = "STM32F4",
+    target = "stm32f446re",
     deps = [
         "//fw/os:main",
         "//fw/platform/stm32f4/common:freertos",
@@ -51,7 +51,7 @@ cc_fw_test(
     srcs = ["fail_test.cc"],
     board = "//fw/boards/nucleo_f446re",
     negative = True,
-    target = "STM32F4",
+    target = "stm32f446re",
     deps = [
         "//fw/os:main",
         "//fw/platform/stm32f4/common:freertos",

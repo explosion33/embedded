@@ -35,26 +35,23 @@ class ProbeInfo:
     probe: debug_probe.DebugProbe
 
 
-def get_probes_with_family(family: str) -> list[ProbeInfo]:
-    """Gets a list of  `ProbeInfo` objects that match the given family.
-    Searches all connected probes and finds devices with a similar family.
-    Family compatibily is not garunteed and must be handled downstream. e.g.
-    "STM32F4" -> (STM32F401CC, STM32F446RE)
-    "STM32F446" -> (STM32F446RE)
-    """
-    return [
-        ProbeInfo(
+def get_probe_infos() -> list[ProbeInfo]:
+    """Gets a list of  `ProbeInfo` objects connected to this host."""
+    out = []
+    for probe in helpers.ConnectHelper.get_all_connected_probes():
+        info = ProbeInfo(
             uid=probe.unique_id,
             description=probe.description,
-            name=info.name,
-            target=target,
+            name="",
+            target="",
             probe=probe,
         )
-        for probe in helpers.ConnectHelper.get_all_connected_probes()
-        if (info := probe.associated_board_info)
-        and (target := info.target)
-        and target.upper().startswith(family.upper())
-    ]
+        if probe.associated_board_info:
+            info.name = probe.associated_board_info.name
+            if probe.associated_board_info.target:
+                info.target = probe.associated_board_info.target
+        out.append(info)
+    return out
 
 
 def get_probe(uid: str) -> debug_probe.DebugProbe:
@@ -133,20 +130,30 @@ def flash(config: FlashConfig):
             target.reset()
 
 
-def flash_from(binary_path: pathlib.Path, target: str):
+def flash_from(binary_path: pathlib.Path, target: str, uid: str | None):
     """
     Flashes the binary at the provided path to the first debug probe found that
     matches the provided target.
     """
-    probe_infos = get_probes_with_family(target)
 
-    if not probe_infos:
-        raise click.ClickException(
-            f"No Debug Probes found for target: '{target}', please specify full target and UID."
-        )
-    info = probe_infos[0]
+    probes = get_probe_infos()
+    if uid is None:
+        if len(probes) != 1:
+            raise click.ClickException(
+                f"Expected exactly one probe since no 'uid' was provided, got {len(probes)}"
+            )
+        info = probes[0]
+    else:
 
-    base_address = get_default_base(info.target)
+        def find_probe():
+            for probe in probes:
+                if probe.uid == uid:
+                    return probe
+            raise click.ClickException(f"Probe with uid '{uid}' was not found.")
+
+        info = find_probe()
+
+    base_address = get_default_base(target)
     if base_address is None:
         raise click.ClickException(
             f"Could not detect base address for target '{target}', please explicitely provide one."
@@ -157,7 +164,7 @@ def flash_from(binary_path: pathlib.Path, target: str):
             probe=info.probe,
             binary=binary_path,
             flash_address=base_address,
-            target=info.target,
+            target=target,
             reset=True,
             verbose=True,
         )
@@ -177,10 +184,16 @@ def flash_from(binary_path: pathlib.Path, target: str):
     "--target",
     required=True,
     type=str,
-    help="The target of the device to autodetect and flash too.",
+    help="The target of the device to flash too.",
 )
-def main(binary_path: pathlib.Path, target: str):
-    flash_from(binary_path, target)
+@click.option(
+    "--uid",
+    required=False,
+    type=str,
+    help="The uid of the flashing probe to select.",
+)
+def main(binary_path: pathlib.Path, target: str, uid: str | None):
+    flash_from(binary_path, target, uid)
 
 
 if __name__ == "__main__":
