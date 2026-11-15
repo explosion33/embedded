@@ -34,6 +34,15 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "runtime",
+    deps = [
+        ":nucleo_f446re",
+        "//fw/platform/stm32f4/common:freertos",
+    ],
+    alwayslink = True,
+)
+
 # Provides FreeRTOSConfig.h to the FreeRTOS kernel, via the flag set above.
 cc_library(
     name = "freertos_config",
