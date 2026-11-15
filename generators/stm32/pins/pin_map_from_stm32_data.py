@@ -9,6 +9,7 @@ from generators.stm32.pins import stm32_data_parser
 
 PORT_PIN_REGEX = re.compile(r"^P(?P<port>\w)(?P<pin>\d+).*$")
 UART_REGEX = re.compile(r"^U(S|)ART(?P<idx>\d+)$")
+I2C_REGEX = re.compile(r"^I2C(?P<idx>\d+)$")
 
 
 def get_enum_name(pin_name: str):
@@ -61,6 +62,39 @@ class Uart:
     enum: EnumValue
     tx_pins: list[EnumValue]  # value is AF.
     rx_pins: list[EnumValue]  # value is AF.
+
+
+@dataclasses.dataclass
+class I2c:
+    enum: EnumValue
+    scl_pins: list[EnumValue]  # value is AF.
+    sda_pins: list[EnumValue]  # value is AF.
+
+
+def _parse_i2cs(data: stm32_data_parser.Stm32Data) -> list[I2c]:
+    i2cs: list[I2c] = []
+    for i2c in data.get_peripherals("i2c"):
+        match = re.search(I2C_REGEX, i2c.name)
+        if not match:
+            raise click.ClickException(f"Got unexpected i2c name: '{i2c.name}'")
+        idx = int(match.group("idx"))
+        entry = I2c(EnumValue(f"k{i2c.name}", idx), [], [])
+
+        for pin in i2c.pins:
+            if pin.signal == "SDA":
+                entry.sda_pins.append(EnumValue(get_enum_name(pin.pin), pin.af))
+            if pin.signal == "SCL":
+                entry.scl_pins.append(EnumValue(get_enum_name(pin.pin), pin.af))
+
+        if len(entry.sda_pins) == 0:
+            raise click.ClickException(f"Expected at least 1 SDA pin for {i2c.name}, got 0.")
+
+        if len(entry.scl_pins) == 0:
+            raise click.ClickException(f"Expected at least 1 SCL pin for {i2c.name}, got 0.")
+
+        i2cs.append(entry)
+
+    return i2cs
 
 
 def _parse_uarts(data: stm32_data_parser.Stm32Data) -> list[Uart]:
@@ -125,12 +159,15 @@ def main(
     data = stm32_data_parser.Stm32Data(path)
     t_pins, t_ports = _parse_pins(data)
     uarts = _parse_uarts(data)
+    i2cs = _parse_i2cs(data)
+    print(i2cs)
 
     content_h = j2_h_template.render(
         namespace=namespace,
         pins=t_pins,
         ports=t_ports,
         uarts=uarts,
+        i2cs=i2cs,
     )
     output_h.write_text(content_h)
 

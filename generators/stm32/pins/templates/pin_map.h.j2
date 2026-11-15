@@ -26,6 +26,13 @@ enum class Uart : uint8_t {
 {% endfor %}
 };
 
+// Enumeration of all I2C peripherals supported by this target.
+enum class I2c : uint8_t {
+{% for i2c in i2cs %}
+    {{ i2c.enum.enum_name }} = {{ i2c.enum.enum_value }},
+{% endfor %}  
+};
+
 // Returns the port for the provided `pin`.
 constexpr Port GetPort(Pin pin) {
     switch (pin) {
@@ -81,6 +88,39 @@ constexpr std::optional<uint8_t> GetUartRxAf(Uart uart, Pin pin) {
         }
         {% endfor %}
     }
-     __builtin_unreachable();
+    __builtin_unreachable();
 }
+
+constexpr std::optional<uint8_t> GetI2cSdaAf(I2c i2c, Pin pin) {
+    switch (i2c) {
+        {% for i2c in i2cs %}
+        case I2c::{{ i2c.enum.enum_name }}:
+            switch (pin) {        
+                {% for pin in i2c.sda_pins %}
+                case Pin::{{ pin.enum_name }}: return {{ pin.enum_value }};
+                {% endfor %}
+                default:
+                    return std::nullopt;
+            {% endfor %}
+        }
+    }
+    __builtin_unreachable();
+}
+
+constexpr std::optional<uint8_t> GetI2cSclAf(I2c i2c, Pin pin) {
+    switch (i2c) {
+        {% for i2c in i2cs %}
+        case I2c::{{ i2c.enum.enum_name }}:
+            switch (pin) {        
+                {% for pin in i2c.scl_pins %}
+                case Pin::{{ pin.enum_name }}: return {{ pin.enum_value }};
+                {% endfor %}
+                default:
+                    return std::nullopt;
+        }
+        {% endfor %}
+    }
+    __builtin_unreachable();
+}
+
 } // {{ namespace }}

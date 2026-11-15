@@ -45,5 +45,14 @@ TEST(PinMapStm32Data, Uart4) {
   EXPECT_EQ(GetUartRxAf(Uart::kUART4, Pin::kPC11), std::nullopt);
 }
 
+TEST(PinMapStm32Data, I2c1) {
+  EXPECT_EQ(GetI2cSclAf(I2c::kI2C1, Pin::kPC15), 4);
+  EXPECT_EQ(GetI2cSclAf(I2c::kI2C1, Pin::kPH0), std::nullopt);
+
+  EXPECT_EQ(GetI2cSdaAf(I2c::kI2C1, Pin::kPH0), 4);
+  EXPECT_EQ(GetI2cSdaAf(I2c::kI2C1, Pin::kPH1), 5);
+  EXPECT_EQ(GetI2cSdaAf(I2c::kI2C1, Pin::kPC15), std::nullopt);
+}
+
 }  // namespace
 }  // namespace generators::pins

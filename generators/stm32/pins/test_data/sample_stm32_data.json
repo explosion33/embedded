@@ -66,6 +66,32 @@
               "af": 7
             }
           ]
+        },
+        {
+          "name": "I2C1",
+          "address": 1073760256,
+          "registers": {
+            "kind": "i2c",
+            "version": "v2",
+            "block": "I2C"
+          },
+          "pins": [
+            {
+              "pin": "PH0",
+              "signal": "SDA",
+              "af": 4
+            },
+            {
+              "pin": "PC15",
+              "signal": "SCL",
+              "af": 4
+            },
+            {
+              "pin": "PH1",
+              "signal": "SDA",
+              "af": 5
+            }
+          ]
         }
       ],
       "pins": [
