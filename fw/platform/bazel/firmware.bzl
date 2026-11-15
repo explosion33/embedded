@@ -108,12 +108,13 @@ def cc_fw_app(
       **kwargs: Args passed through to the underyling binary.
     """
     board_label = native.package_relative_label(board)
+    runtime = board_label.same_package_label("runtime")
     elf_name = name + ".elf"
 
     cc_binary(
         name = elf_name,
         srcs = srcs,
-        deps = deps + [board_label, "//fw/base:newlib_stubs"],
+        deps = deps + [runtime, "//fw/base:newlib_stubs"],
         features = ["generate_linkmap"],
         target_compatible_with = target_compatible_with,
         **kwargs
