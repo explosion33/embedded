@@ -38,3 +38,22 @@ cc_fw_test(
         "//fw/os:os_test_lib",
     ],
 )
+
+cc_fw_test(
+    name = "pass_test",
+    board = "//fw/boards/nucleo_f446re",
+    target = "stm32f446re",
+    deps = [
+        "//fw/testing:pass_test_lib",
+    ],
+)
+
+cc_fw_test(
+    name = "fail_test",
+    board = "//fw/boards/nucleo_f446re",
+    negative = True,
+    target = "stm32f446re",
+    deps = [
+        "//fw/testing:fail_test_lib",
+    ],
+)
