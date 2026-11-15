@@ -161,7 +161,6 @@ cc_library(
         ":semaphore",
         ":thread",
         ":time",
-        "//fw/platform/stm32f4/common:freertos",
         "//fw/testing:test",
     ],
     alwayslink = True,

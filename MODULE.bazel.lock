@@ -200,7 +200,7 @@
     "//:stm32_data.bzl%stm32_data": {
       "general": {
         "bzlTransitiveDigest": "Qt2AGSuqLcKDxIZM+LkLUivhnVafeGm8ZJMMBumjBqA=",
-        "usagesDigest": "XkVLPC+4EXjlHW+z5j4/r2aKlTcNuuHANNJ8+X9t+I0=",
+        "usagesDigest": "eoetSp+jIrcSIakIIJ/L1eCtCKlMQT9Si/tdurPTew0=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
         ],
@@ -212,6 +212,15 @@
                 "https://raw.githubusercontent.com/embassy-rs/stm32-data-generated/2f16f70371ce3e0fb6b444532a6dd88a796cea8c/data/chips/STM32F446RE.json"
               ],
               "sha256": "9b7b7da3e10f8b445dbd6ca926dc32fad7bb71a1c923d312503f17db45c07206"
+            }
+          },
+          "STM32F411CC": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://raw.githubusercontent.com/embassy-rs/stm32-data-generated/2f16f70371ce3e0fb6b444532a6dd88a796cea8c/data/chips/STM32F411CC.json"
+              ],
+              "sha256": "738e8b64dcc3951259625476d76cc2a9c1e75f3ab0579e7834d94a77b30ee560"
             }
           }
         }

@@ -18,3 +18,8 @@ filegroup(
     name = "startup_stm32f446xx_src",
     srcs = ["Source/Templates/gcc/startup_stm32f446xx.s"],
 )
+
+filegroup(
+    name = "startup_stm32f411xe_src",
+    srcs = ["Source/Templates/gcc/startup_stm32f411xe.s"],
+)

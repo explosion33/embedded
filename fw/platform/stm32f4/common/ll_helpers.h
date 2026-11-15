@@ -31,12 +31,18 @@ constexpr USART_TypeDef* GetLLUsart(pins::Uart uart) {
       return USART1;
     case 2:
       return USART2;
+#if defined(USART3)
     case 3:
       return USART3;
+#endif
+#if defined(UART4)
     case 4:
       return UART4;
+#endif
+#if defined(UART5)
     case 5:
       return UART5;
+#endif
     case 6:
       return USART6;
     default:
@@ -51,12 +57,18 @@ constexpr uint32_t GetLLUsartClock(pins::Uart uart) {
       return LL_APB2_GRP1_PERIPH_USART1;
     case 2:
       return LL_APB1_GRP1_PERIPH_USART2;
+#if defined(USART3)
     case 3:
       return LL_APB1_GRP1_PERIPH_USART3;
+#endif
+#if defined(UART4)
     case 4:
       return LL_APB1_GRP1_PERIPH_UART4;
+#endif
+#if defined(UART5)
     case 5:
       return LL_APB1_GRP1_PERIPH_UART5;
+#endif
     case 6:
       return LL_APB2_GRP1_PERIPH_USART6;
     default:

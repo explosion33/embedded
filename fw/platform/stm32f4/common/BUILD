@@ -20,6 +20,7 @@ cc_library(
     defines = select(
         {
             "//fw/platform/constraints:is_stm32f446": ["STM32F446xx"],
+            "//fw/platform/constraints:is_stm32f411": ["STM32F411xE"],
         },
         no_match_error = "//fw/platform/stm32f4 requires an STM32F4 target platform",
     ),
@@ -93,6 +94,7 @@ alias(
     actual = select(
         {
             "//fw/platform/constraints:is_stm32f446": "//fw/platform/stm32f4/f446:stm32f446re_pin_map",
+            "//fw/platform/constraints:is_stm32f411": "//fw/platform/stm32f4/f411:stm32f411cc_pin_map",
         },
         no_match_error = "//fw/platform/stm32f4 has no pin map for this target platform",
     ),
